@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.morn.anightwerewolf.mapper.UserinfoMapper">
+
+    <select id="selectListByCondition" resultType="online.morn.anightwerewolf.DO.UserinfoDO">
+        select * from userinfo
+        where 1=1
+        <if test="userinfoDO.id!=null">
+            and id=#{userinfoDO.id}
+        </if>
+        <if test="userinfoDO.email!=null">
+            and id=#{userinfoDO.email}
+        </if>
+        <if test="userinfoDO.ext!=null">
+            and id=#{userinfoDO.ext}
+        </if>
+        <if test="userinfoDO.businessUnit!=null">
+            and id=#{userinfoDO.businessUnit}
+        </if>
+        <if test="userinfoDO.level!=null">
+            and id=#{userinfoDO.level}
+        </if>
+        <if test="userinfoDO.workEmail!=null">
+            and id=#{userinfoDO.workEmail}
+        </if>
+        <if test="userinfoDO.depId!=null">
+            and id=#{userinfoDO.depId}
+        </if>
+        <if test="userinfoDO.mobileNo!=null">
+            and id=#{userinfoDO.mobileNo}
+        </if>
+        <if test="userinfoDO.department!=null">
+            and id=#{userinfoDO.department}
+        </if>
+        <if test="userinfoDO.job!=null">
+            and id=#{userinfoDO.job}
+        </if>
+        <if test="userinfoDO.type!=null">
+            and id=#{userinfoDO.type}
+        </if>
+        <if test="userinfoDO.wangwangId!=null">
+            and id=#{userinfoDO.wangwangId}
+        </if>
+        <if test="userinfoDO.status!=null">
+            and id=#{userinfoDO.status}
+        </if>
+        <if test="userinfoDO.gender!=null">
+            and id=#{userinfoDO.gender}
+        </if>
+        <if test="userinfoDO.loginName!=null">
+            and id=#{userinfoDO.loginName}
+        </if>
+        <if test="userinfoDO.manager!=null">
+            and id=#{userinfoDO.manager}
+        </if>
+        <if test="userinfoDO.nickName!=null">
+            and id=#{userinfoDO.nickName}
+        </if>
+        <if test="userinfoDO.staffNo!=null">
+            and id=#{userinfoDO.staffNo}
+        </if>
+        <if test="userinfoDO.trueName!=null">
+            and id=#{userinfoDO.trueName}
+        </if>
+        limit #{startRow},#{length}
+    </select>
+</mapper>
