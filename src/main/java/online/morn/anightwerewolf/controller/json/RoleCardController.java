@@ -21,7 +21,7 @@ public class RoleCardController {
     private RoleCardMapper roleCardMapper;
 
     @RequestMapping(value = "/getAllList.json", method = {RequestMethod.GET , RequestMethod.POST})
-    public String getUserinfoList(ModelMap modelMap) {
+    public String getAllList(ModelMap modelMap) {
         try{
             List<RoleCardDO> roleCardDOList = roleCardMapper.selectAllList();
             if(roleCardDOList != null){

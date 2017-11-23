@@ -11,4 +11,9 @@ public class IndexController {
         return "index";
     }
 
+    @RequestMapping("/room")
+    public String room() {
+        return "room";
+    }
+
 }

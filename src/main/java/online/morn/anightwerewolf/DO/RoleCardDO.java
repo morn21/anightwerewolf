@@ -5,18 +5,17 @@ package online.morn.anightwerewolf.DO;
  * @auther Horner 2017/11/19 4:44
  */
 public class RoleCardDO {
-    private Integer id;
+    private String id;
     private String name;
-    private String key;
     private Integer isSelected;
     private Integer orderNum;
     private Integer peopleCount;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -26,14 +25,6 @@ public class RoleCardDO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public Integer getIsSelected() {

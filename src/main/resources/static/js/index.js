@@ -1,37 +1,45 @@
 var roleCardList = [];//角色卡列表
 
-//获取缺省房间名称 格式：房间YYYYMMDDHH
-/*var getDefaultRoomName = function(){
-    var myDate = new Date();
-    var seperator1 = "";
-    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
-    var month = myDate.getMonth();      //获取当前月份(0-11,0代表1月)
-    var date = myDate.getDate();        //获取当前日(1-31)
-    var hour = myDate.getHours();       //获取当前小时数(0-23)
-    var minute = myDate.getMinutes();     //获取当前分钟数(0-59)
-    var second = myDate.getSeconds();     //获取当前秒数(0-59)
-    if (month > 0 && month <= 9) {
-        month = "0" + month;
-    }
-    if (date >= 0 && date <= 9) {
-        date = "0" + date;
-    }
-    if (hour >= 0 && hour <= 9) {
-        hour = "0" + hour;
-    }
-    if (minute >= 0 && minute <= 9) {
-        minute = "0" + minute;
-    }
-    if (second >= 0 && second <= 9) {
-        second = "0" + second;
-    }
-    return "房间" + year + seperator1 + month + seperator1 + date + seperator1 + hour + seperator1 + minute + seperator1 + second;
-};*/
+//导航1被点击时
+$("#nav1").click(function(){
+    $("#nav1").attr("class","active");
+    $("#nav2").attr("class","");
+    $("#navDiv1").css("display","block");
+    $("#navDiv2").css("display","none");
+});
+
+//导航2被点击时
+$("#nav2").click(function(){
+    $("#nav1").attr("class","");
+    $("#nav2").attr("class","active");
+    $("#navDiv1").css("display","none");
+    $("#navDiv2").css("display","block");
+});
+
+//点击进入房间按钮
+$("#intoRoomButton").click(function(){
+    $.ajax({
+        type : "POST",  //提交方式
+        url : "/room/intoRoom.json",//路径
+        data : {
+            name : $("#intoRoomName").val(),
+            password : $("#intoRoomPassword").val()
+        },
+        dataType : "json",
+        success :  function(result){
+            if(result.success){
+                window.location.href = "/room";
+            } else{
+                $("#errorMsgDiv").html(result.msg);
+            }
+        }
+    });
+});
 
 //点击角色卡按钮
-var clickRoleCardButton = function(key){
+var clickRoleCardButton = function(id){
     $.each(roleCardList,function(i,obj){
-        if(obj.key == key){
+        if(obj.id == id){
             if(obj.isSelected == 1){
                 obj.isSelected = 0;
             } else {
@@ -54,9 +62,9 @@ var describeRoleCardList = function(){
             html += "btn-primary";
             peopleCount += obj.peopleCount;//累计人数
         }
-        html += "' onclick='clickRoleCardButton(\"" + obj.key + "\")'>";
+        html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
         html += obj.name;
-        if(obj.peopleCount == 2){
+        if(obj.peopl$eCount == 2){
             html += "*2";
         }
         html += "</button> ";
@@ -66,14 +74,12 @@ var describeRoleCardList = function(){
 };
 
 var ini = function () {
-    //$("#roomName").val(getDefaultRoomName());//用当前日期当默认房间名
     $.ajax({
         type : "POST",  //提交方式
         url : "/roleCard/getAllList.json",//路径
         data : {},
         dataType : "json",
         success :  function(result){
-            console.info("result:" + result);
             if(result.success){
                 roleCardList = result.data;
                 describeRoleCardList();//描绘角色卡列表
@@ -84,7 +90,22 @@ var ini = function () {
 
 //点击确认创建房间按钮事件
 $("#confirmCreateRoomButton").click(function(){
-
+    $.ajax({
+        type : "POST",  //提交方式
+        url : "/room/createRoom.json",//路径
+        data : {
+            password : $("#roomPassword").val(),
+            roleCardListStr : JSON.stringify(roleCardList)
+        },
+        dataType : "json",
+        success :  function(result){
+            if(result.success){
+                window.location.href = "/room";
+            } else{
+                $("#errorMsgDiv").html(result.msg);
+            }
+        }
+    });
 });
 
 //初始化
