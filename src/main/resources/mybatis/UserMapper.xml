@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.morn.anightwerewolf.mapper.UserMapper">
+    <insert id="insert" parameterType="online.morn.anightwerewolf.DO.UserDO">
+        insert into user (id,createTime,name) values (#{userDO.id},now(),#{userDO.name})
+    </insert>
+    <select id="selectMaxNameValue" resultType="java.lang.Integer">
+        select max(substring_index(name,'-',-1)+0) from user
+        where name like 'u-%'
+    </select>
+    <select id="selectUserById" resultType="online.morn.anightwerewolf.DO.UserDO">
+        select * from user where id=#{id}
+    </select>
+</mapper>

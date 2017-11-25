@@ -11,4 +11,7 @@
     <select id="selectRoomByNameAndPassword" resultType="online.morn.anightwerewolf.DO.RoomDO">
         select * from room where name=#{name} and password=#{password}
     </select>
+    <select id="selectRoomById" resultType="online.morn.anightwerewolf.DO.RoomDO">
+        select * from room where id=#{id}
+    </select>
 </mapper>

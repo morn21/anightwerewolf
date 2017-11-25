@@ -16,7 +16,7 @@ public class IdUtil {
     public static String getId(){
         String uuid = UUID.randomUUID().toString();
         //去掉“-”符号
-        return uuid.replaceAll("-", "");
+        return uuid.replaceAll("-", "").toUpperCase();
     }
 
 }

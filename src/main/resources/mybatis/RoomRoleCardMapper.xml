@@ -4,4 +4,7 @@
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.RoomRoleCardDO">
         insert into room_role_card (id,roomId,roleCardId) values (#{roomRoleCardDO.id},#{roomRoleCardDO.roomId},#{roomRoleCardDO.roleCardId})
     </insert>
+    <select id="selectRoomRoleCardListByRoomId" resultType="online.morn.anightwerewolf.DO.RoomRoleCardDO">
+        select * from room_role_card where roomId=#{roomId}
+    </select>
 </mapper>

@@ -73,6 +73,7 @@ var describeRoleCardList = function(){
     $("#peopleCount").html(peopleCount - 3);
 };
 
+//执行初始化
 var ini = function () {
     $.ajax({
         type : "POST",  //提交方式

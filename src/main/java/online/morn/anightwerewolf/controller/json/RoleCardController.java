@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * 角色卡
+ * @auther Horner 2017/11/26 0:21
+ */
 @RequestMapping(value = "/roleCard")
 @RestController
 public class RoleCardController {
@@ -24,6 +28,22 @@ public class RoleCardController {
     public String getAllList(ModelMap modelMap) {
         try{
             List<RoleCardDO> roleCardDOList = roleCardMapper.selectAllList();
+            /*for(RoleCardDO ro : roleCardDOList){
+                System.out.println("public static final String " +ro.getId()+ " = \"" +ro.getId()+ "\";//" + ro.getName() + " orderNum:"+ro.getOrderNum() + " peopleCount:" +ro.getPeopleCount());
+                String roleId = ro.getId();
+                StringBuffer strBuffer = new StringBuffer();
+                for(int i = 0 ; i < roleId.length() ; i++){
+                    char chr = roleId.charAt(i);
+                    if(Character.isUpperCase(chr) && i != 0){
+                        strBuffer.append("_" + chr);
+                    } else if(Character.isDigit(chr)){
+                        strBuffer.append("_" + chr);
+                    } else {
+                        strBuffer.append(String.valueOf(chr).toUpperCase());
+                    }
+                }
+                System.out.println("update role_card set id='" +strBuffer.toString() + "' where id='" + roleId + "';");
+            }*/
             if(roleCardDOList != null){
                 modelMap.put("data",roleCardDOList);
                 modelMap.put("success",true);

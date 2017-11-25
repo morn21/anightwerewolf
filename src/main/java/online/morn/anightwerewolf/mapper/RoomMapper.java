@@ -3,10 +3,14 @@ package online.morn.anightwerewolf.mapper;
 import online.morn.anightwerewolf.DO.RoomDO;
 import org.apache.ibatis.annotations.Param;
 
+/**
+ * 房间表
+ * @auther Horner 2017/11/26 0:34
+ */
 public interface RoomMapper {
 
     /**
-     * 插入房间
+     * 添加房间
      * @auther Horner 2017/11/19 9:04
      * @param roomDO
      * @return
@@ -28,4 +32,12 @@ public interface RoomMapper {
      * @return
      */
     public RoomDO selectRoomByNameAndPassword(@Param("name") String name, @Param("password") String password);
+
+    /**
+     * 查询房间根据ID
+     * @auther Horner 2017/11/26 0:17
+     * @param id
+     * @return
+     */
+    public RoomDO selectRoomById(@Param("id") String id);
 }

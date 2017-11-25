@@ -3,15 +3,13 @@ package online.morn.anightwerewolf.DO;
 import java.sql.Date;
 
 /**
- * 房间表
- * @auther Horner 2017/11/19 9:00
+ * 用户表
+ * @auther Horner 2017/11/26 0:23
  */
-public class RoomDO {
+public class UserDO {
     private String id;
     private Date createTime;
     private String name;
-    private String password;
-    private Integer peopleCount;
 
     public String getId() {
         return id;
@@ -35,21 +33,5 @@ public class RoomDO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getPeopleCount() {
-        return peopleCount;
-    }
-
-    public void setPeopleCount(Integer peopleCount) {
-        this.peopleCount = peopleCount;
     }
 }
