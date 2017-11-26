@@ -19,4 +19,7 @@ public class IdUtil {
         return uuid.replaceAll("-", "").toUpperCase();
     }
 
+    /*public static void main(String[] args){
+        System.out.println("---------" + IdUtil.getId());
+    }*/
 }

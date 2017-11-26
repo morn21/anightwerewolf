@@ -3,6 +3,7 @@ package online.morn.anightwerewolf.service;
 import online.morn.anightwerewolf.DO.RoleCardDO;
 import online.morn.anightwerewolf.DO.RoomRoleCardDO;
 import online.morn.anightwerewolf.util.MyException;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,13 @@ public interface RoomRoleCardService {
      * @throws MyException
      */
     public List<RoomRoleCardDO> generateRoomRoleCard(String roomId, List<RoleCardDO> roleCardDOList) throws MyException;
+
+    /**
+     * 查询房间角色卡列表 根据房间ID
+     * @auther Horner 2017/11/26 0:58
+     * @param roomId
+     * @return
+     * @throws MyException
+     */
+    public List<RoomRoleCardDO> findRoomRoleCardListByRoomId(String roomId) throws MyException;;
 }

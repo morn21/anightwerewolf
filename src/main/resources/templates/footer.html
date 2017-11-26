@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 
+    <!-- jq二维码生成器 参考网址：https://www.helloweba.com/view-blog-226.html -->
+    <script type="text/javascript" src="/js/qrcode.js"></script>
+    <script type="text/javascript" src="/js/jquery.qrcode.js"></script>
+
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
 
@@ -19,9 +23,20 @@
 
 <footer th:fragment="roomPublic">
     <div class="panel panel-default marginTop10">
-        <span class="glyphicon glyphicon-home" style="margin:10px;" id="roomPublic_roomName"></span>
+        <span class="glyphicon glyphicon-flag" style="margin:10px;" id="roomPublic_roomName"></span>
         <span class="glyphicon glyphicon-user" style="margin:10px;" id="roomPublic_userName"></span>
-        <button type="button" class="btn btn-link" id="roomPublic_returnIndexButton">回首页</button>
+        <button type="button" class="btn btn-link" id="roomPublic_returnIndexButton">
+            <span class="glyphicon glyphicon-home"></span>
+        </button>
+        <button type="button" class="btn btn-link" id="roomPublic_showQrCodeButton">
+            <span class="glyphicon glyphicon-qrcode"></span>
+        </button>
+    </div>
+    <div class="panel panel-default marginTop10" id="roomPublic_showQrCodeDiv" style="display: none;">
+        <div class="panel-heading">
+            扫描图中二维码进入房间
+        </div>
+        <div class="panel-body" id="roomPublic_roomQrCodeDiv"></div>
     </div>
     <div class="panel panel-default marginTop10">
         <div class="panel-heading">

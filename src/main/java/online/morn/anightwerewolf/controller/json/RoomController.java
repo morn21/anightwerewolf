@@ -106,8 +106,10 @@ public class RoomController {
                     msg = "你妹的，你想让我服务自己嗨吗？";
                 } else if(peopleCount == -1){
                     msg = "大兄弟，咱能不反自然吗？";
-                } else if(peopleCount < -1){
+                } else if(peopleCount == -2){
                     msg = "你再这样我给你出BUG了啊";
+                } else if(peopleCount == -3){
+                    msg = "嘣！哄咔啦咔！你已经被我的BUG炸死了！Biu Biu Biu~";
                 }
                 throw new MyException(msg);
             }
@@ -168,14 +170,14 @@ public class RoomController {
     }
 
     /**
-     * 加载座号
+     * 加载场次
      * @auther Horner 2017/11/26 11:42
      * @param modelMap
      * @param request
      * @return
      */
-    @RequestMapping(value = "/loadSeatNum.json", method = {RequestMethod.GET , RequestMethod.POST})
-    public String loadSeatNum(ModelMap modelMap, HttpServletRequest request) {
+    @RequestMapping(value = "/loadActivity.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String loadActivity(ModelMap modelMap, HttpServletRequest request) {
         try {
             /**验证*/
             RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
@@ -195,6 +197,40 @@ public class RoomController {
             dataMap.put("activityDetailList",activityDetailDOList);
             modelMap.put("success",true);
             modelMap.put("data",dataMap);
+        } catch (MyException e) {
+            modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * 锁定座号
+     * @auther Horner 2017/11/26 19:44
+     * @param modelMap
+     * @param request
+     * @param activityId
+     * @param seatNum
+     * @return
+     */
+    @RequestMapping(value = "/lockSeatNum.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String lockSeatNum(ModelMap modelMap, HttpServletRequest request, String activityId, Integer seatNum) {
+        try {
+            /**验证*/
+            if(StringUtils.isBlank(activityId)){
+                throw new MyException("场次ID不能为空");
+            }
+            if(seatNum == null){
+                throw new MyException("座号不能为空");
+            }
+            UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
+            if(userDO == null){
+                throw new MyException("用户未登录");
+            }
+            activityDetailService.addActivityDetail(userDO.getId(),activityId,seatNum);
+            modelMap.put("success",true);
         } catch (MyException e) {
             modelMap.put("success",false);
             modelMap.put("msg",e.getMessage());

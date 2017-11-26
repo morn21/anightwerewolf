@@ -36,10 +36,10 @@ var clickSeatNumButton = function(seatNum){
 };
 
 //执行初始化
-var ini = function () {
+var ini = function(isNotCleanErrorMsg) {
     $.ajax({
         type : "POST",  //提交方式
-        url : "/room/loadSeatNum.json",//路径
+        url : "/room/loadActivity.json",//路径
         data : {},
         dataType : "json",
         success :  function(result){
@@ -64,6 +64,9 @@ var ini = function () {
                     });
                 }
                 describeSeatNumList();//描绘座号列表
+                if(isNotCleanErrorMsg == undefined || !isNotCleanErrorMsg){
+                    $("#errorMsgDiv").html("");
+                }
             }
         }
     });
@@ -80,7 +83,24 @@ $("#lockSeatNumButton").click(function(){
     if(selectedSeatNum == 0){
         $("#errorMsgDiv").html("别闹了，快选一个座号！");
     } else {
-
+        var activityId = $("#activityId").html();
+        $.ajax({
+            type : "POST",  //提交方式
+            url : "/room/lockSeatNum.json",//路径
+            data : {
+                activityId : activityId,
+                seatNum : selectedSeatNum
+            },
+            dataType : "json",
+            success :  function(result){
+                if(result.success){
+                    window.location.href = "/activity?id=" + activityId;
+                } else {
+                    ini(true);
+                    $("#errorMsgDiv").html(result.msg);
+                }
+            }
+        });
     }
 });
 

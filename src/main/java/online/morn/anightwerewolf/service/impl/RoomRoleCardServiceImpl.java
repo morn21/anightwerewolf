@@ -40,4 +40,9 @@ public class RoomRoleCardServiceImpl implements RoomRoleCardService {
         }
         return roomRoleCardDOList;
     }
+
+    @Override
+    public List<RoomRoleCardDO> findRoomRoleCardListByRoomId(String roomId) throws MyException{
+        return roomRoleCardMapper.selectRoomRoleCardListByRoomId(roomId);
+    }
 }

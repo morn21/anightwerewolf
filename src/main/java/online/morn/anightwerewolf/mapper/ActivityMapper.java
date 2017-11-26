@@ -18,10 +18,26 @@ public interface ActivityMapper {
     public Integer insert(@Param("activityDO") ActivityDO activityDO);
 
     /**
+     * 修改场次 根据场次ID
+     * @auther Horner 2017/11/27 0:56
+     * @param activityDO
+     * @return
+     */
+    public Integer updateById(@Param("activityDO") ActivityDO activityDO);
+
+    /**
      * 查询未完成场次 根据房间ID
      * @auther Horner 2017/11/26 15:08
      * @param roomId
      * @return
      */
     public ActivityDO selectUnfinishedActivityByRoomId(@Param("roomId") String roomId);
+
+    /**
+     * 查询场次 根据场次ID
+     * @auther Horner 2017/11/26 22:34
+     * @param id
+     * @return
+     */
+    public ActivityDO selectActivityById(@Param("id") String id);
 }

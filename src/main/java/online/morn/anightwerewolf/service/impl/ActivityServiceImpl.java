@@ -32,4 +32,14 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return activityDO;
     }
+
+    @Override
+    public Integer changeById(ActivityDO activityDO) throws MyException {
+        return activityMapper.updateById(activityDO);
+    }
+
+    @Override
+    public ActivityDO findActivityById(String id) throws MyException{
+        return activityMapper.selectActivityById(id);
+    }
 }

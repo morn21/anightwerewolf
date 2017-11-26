@@ -1,13 +1,10 @@
 package online.morn.anightwerewolf.service.impl;
 
-import online.morn.anightwerewolf.DO.RoleCardDO;
 import online.morn.anightwerewolf.DO.RoomDO;
-import online.morn.anightwerewolf.DO.RoomRoleCardDO;
 import online.morn.anightwerewolf.mapper.RoomMapper;
 import online.morn.anightwerewolf.service.RoomService;
 import online.morn.anightwerewolf.util.IdUtil;
 import online.morn.anightwerewolf.util.MyException;
-import online.morn.anightwerewolf.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +53,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomDO findRoomById(String id) throws MyException {
-        return roomMapper.selectRoomById(id);
+        RoomDO roomDO = roomMapper.selectRoomById(id);
+        if(roomDO == null){
+            throw new MyException("房间没有找到");
+        }
+        return roomDO;
     }
 }

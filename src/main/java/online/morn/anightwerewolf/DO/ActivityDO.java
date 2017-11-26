@@ -11,6 +11,7 @@ public class ActivityDO {
     private Date createTime;
     private Date updateTime;
     private String roomId;
+    private Integer isBegin;
     private Integer winStatus;
 
     public String getId() {
@@ -51,5 +52,13 @@ public class ActivityDO {
 
     public void setWinStatus(Integer winStatus) {
         this.winStatus = winStatus;
+    }
+
+    public Integer getIsBegin() {
+        return isBegin;
+    }
+
+    public void setIsBegin(Integer isBegin) {
+        this.isBegin = isBegin;
     }
 }

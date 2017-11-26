@@ -50,8 +50,8 @@ var describeRoleCardList = function(){
         }
         html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
         html += obj.name;
-        if(obj.cardCount == 2){
-            html += "*2";
+        if(obj.cardCount > 1){
+            html += "*" + obj.cardCount;
         }
         html += "</button> ";
     });
