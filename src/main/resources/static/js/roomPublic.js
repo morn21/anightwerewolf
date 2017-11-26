@@ -13,12 +13,11 @@ var iniRoomPublic = function () {
         dataType : "json",
         success :  function(result){
             if(result.success){
-                var user = result.data.user;
                 var room = result.data.room;
+                var user = result.data.user;
                 var roleCardList = result.data.roleCardList;
-
-                $("#roomPublic_userName").html(" 用户：" + user.name);
-                $("#roomPublic_roomName").html(" 房间：" + room.name);
+                $("#roomPublic_roomName").html(" " + room.name);
+                $("#roomPublic_userName").html(" " + user.name);
                 $("#roomPublic_peopleCount").html(room.peopleCount);
                 var html = "";
                 roleCardList.forEach(function (obj) {

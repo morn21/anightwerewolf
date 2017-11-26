@@ -49,7 +49,7 @@ public class RoomServiceImpl implements RoomService {
     public RoomDO loginRoom(String name, String password) throws MyException {
         RoomDO roomDO = roomMapper.selectRoomByNameAndPassword(name, password);
         if(roomDO == null){
-            throw new MyException("房间号或密码错误");
+            throw new MyException("你什么眼神？什么脑子？房间号看不清还是密码记不住？");
         }
         return roomDO;
     }

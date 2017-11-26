@@ -52,10 +52,10 @@ public class RoomController {
     public String intoRoom(ModelMap modelMap, HttpServletRequest request, String name, String password) {
         try {
             if(StringUtils.isBlank(name)){
-                throw new MyException("房间号不能为空");
+                throw new MyException("房间号都不给，你还想干啥？");
             }
             if(StringUtils.isBlank(password)){
-                throw new MyException("密码不能为空");
+                throw new MyException("密码都不输入，你手残吗？");
             }
             RoomDO roomDO = roomService.loginRoom(name, password);
             request.getSession().setAttribute(SessionKey.ROOM,roomDO);//设置房间实例
@@ -83,7 +83,7 @@ public class RoomController {
         try {
             /**验证*/
             if(StringUtils.isBlank(password)){
-                throw new MyException("密码不能为空");
+                throw new MyException("别闹了，给我来个密码！快~");
             }
             if(StringUtils.isBlank(roleCardListStr)){
                 throw new MyException("roleCardListStr不能为空");
@@ -95,8 +95,21 @@ public class RoomController {
                     cardCount += roleCardDO.getCardCount();//累加人数
                 }
             }
-            if(cardCount - 3 < 3){
-                throw new MyException("创建房间最少需要三人");
+            int peopleCount = cardCount - 3;
+            if(peopleCount < 3){
+                String msg = "";
+                if(peopleCount == 2){
+                    msg = "傻逼吧，俩人对着撸啊？";
+                } else if(peopleCount == 1){
+                    msg = "你自己跟空气玩吗？";
+                } else if(peopleCount == 0){
+                    msg = "你妹的，你想让我服务自己嗨吗？";
+                } else if(peopleCount == -1){
+                    msg = "大兄弟，咱能不反自然吗？";
+                } else if(peopleCount < -1){
+                    msg = "你再这样我给你出BUG了啊";
+                }
+                throw new MyException(msg);
             }
             /**生成房间*/
             RoomDO roomDO = roomService.generateRoom(password,cardCount - 3);
@@ -122,7 +135,7 @@ public class RoomController {
     @RequestMapping(value = "/loadRoom.json", method = {RequestMethod.GET , RequestMethod.POST})
     public String loadRoom(ModelMap modelMap, HttpServletRequest request) {
         try {
-            /**验证并生成用户*/
+            /**验证*/
             RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
             if(roomDO == null){
                 throw new MyException("房间未登录");
@@ -164,6 +177,7 @@ public class RoomController {
     @RequestMapping(value = "/loadSeatNum.json", method = {RequestMethod.GET , RequestMethod.POST})
     public String loadSeatNum(ModelMap modelMap, HttpServletRequest request) {
         try {
+            /**验证*/
             RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
             if(roomDO == null){
                 throw new MyException("房间未登录");
@@ -172,9 +186,9 @@ public class RoomController {
             if(userDO == null){
                 throw new MyException("用户未登录");
             }
+            /**获得场次、场次明细*/
             ActivityDO activityDO = activityService.findUnfinishedActivityByRoomId(roomDO.getId());
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityDO.getId());
-
             Map<String,Object> dataMap = new HashMap<>();
             dataMap.put("room",roomDO);
             dataMap.put("activity",activityDO);

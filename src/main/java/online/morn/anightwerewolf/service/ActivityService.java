@@ -10,7 +10,7 @@ import online.morn.anightwerewolf.util.MyException;
 public interface ActivityService {
 
     /**
-     * 查询未完成场次 根据房间ID
+     * 查询未完成场次 根据房间ID（没有就新建一个）
      * @auther Horner 2017/11/26 15:09
      * @param roomId
      * @return

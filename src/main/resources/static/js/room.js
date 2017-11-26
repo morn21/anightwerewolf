@@ -46,6 +46,7 @@ var ini = function () {
             if(result.success){
                 var data = result.data;
                 $("#activityId").html(data.activity.id);//设置显示场次ID
+                seatNumList = [];//置空内存中的座号列表
                 var peopleCount = data.room.peopleCount;//房间人数
                 var activityDetailList = data.activityDetailList;//场次明细列表
                 for(var i = 0 ; i < peopleCount ; i++){
@@ -70,7 +71,17 @@ var ini = function () {
 
 //锁定座号按钮
 $("#lockSeatNumButton").click(function(){
-    //未完待续。。。
+    var selectedSeatNum = 0;
+    seatNumList.forEach(function(obj){
+        if(obj.isSelected){
+            selectedSeatNum = obj.seatNum;
+        }
+    });
+    if(selectedSeatNum == 0){
+        $("#errorMsgDiv").html("别闹了，快选一个座号！");
+    } else {
+
+    }
 });
 
 //点击刷新座号列表按钮
