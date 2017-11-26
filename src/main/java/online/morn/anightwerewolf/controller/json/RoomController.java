@@ -2,15 +2,9 @@ package online.morn.anightwerewolf.controller.json;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import online.morn.anightwerewolf.DO.RoleCardDO;
-import online.morn.anightwerewolf.DO.RoomDO;
-import online.morn.anightwerewolf.DO.RoomRoleCardDO;
-import online.morn.anightwerewolf.DO.UserDO;
-import online.morn.anightwerewolf.mapper.RoomMapper;
-import online.morn.anightwerewolf.mapper.RoomRoleCardMapper;
-import online.morn.anightwerewolf.mapper.UserMapper;
-import online.morn.anightwerewolf.service.RoleCardService;
-import online.morn.anightwerewolf.util.IdUtil;
+import online.morn.anightwerewolf.DO.*;
+import online.morn.anightwerewolf.service.*;
+import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.SessionKey;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +29,15 @@ public class RoomController {
     private Logger logger = Logger.getLogger(RoomController.class);
 
     @Autowired
-    private RoomMapper roomMapper;
-    @Autowired
-    private RoomRoleCardMapper roomRoleCardMapper;
-    @Autowired
-    private UserMapper userMapper;
+    private RoomService roomService;
     @Autowired
     private RoleCardService roleCardService;
+    @Autowired
+    private RoomRoleCardService roomRoleCardService;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private ActivityDetailService activityDetailService;
 
     /**
      * 进入房间
@@ -57,20 +52,18 @@ public class RoomController {
     public String intoRoom(ModelMap modelMap, HttpServletRequest request, String name, String password) {
         try {
             if(StringUtils.isBlank(name)){
-                throw new Exception("房间号不能为空");
+                throw new MyException("房间号不能为空");
             }
             if(StringUtils.isBlank(password)){
-                throw new Exception("密码不能为空");
+                throw new MyException("密码不能为空");
             }
-            RoomDO roomDO = roomMapper.selectRoomByNameAndPassword(name, password);
-            if(roomDO == null){
-                throw new Exception("房间号或密码错误");
-            }
-            request.getSession().setAttribute(SessionKey.ROOM_ID,roomDO.getId());//设置房间ID
+            RoomDO roomDO = roomService.loginRoom(name, password);
+            request.getSession().setAttribute(SessionKey.ROOM,roomDO);//设置房间实例
             modelMap.put("success",true);
-        } catch (Exception e) {
+        } catch (MyException e) {
             modelMap.put("success",false);
             modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
         }
         return JSONObject.toJSONString(modelMap);
@@ -90,54 +83,30 @@ public class RoomController {
         try {
             /**验证*/
             if(StringUtils.isBlank(password)){
-                throw new Exception("密码不能为空");
+                throw new MyException("密码不能为空");
             }
             if(StringUtils.isBlank(roleCardListStr)){
-                throw new Exception("roleCardListStr不能为空");
+                throw new MyException("roleCardListStr不能为空");
             }
             List<RoleCardDO> roleCardDOList = JSON.parseArray(roleCardListStr,RoleCardDO.class);
-            int peopleCount = 0;
+            int cardCount = 0;
             for(RoleCardDO roleCardDO : roleCardDOList){
                 if(roleCardDO.getIsSelected() == 1){
-                    peopleCount += roleCardDO.getPeopleCount();//累加人数
+                    cardCount += roleCardDO.getCardCount();//累加人数
                 }
             }
-            if(peopleCount - 3 <= 3){
-                throw new Exception("创建房间最少需要三人");
+            if(cardCount - 3 < 3){
+                throw new MyException("创建房间最少需要三人");
             }
             /**生成房间*/
-            Integer nameValue = roomMapper.selectMaxNameValue();
-            SimpleDateFormat df = new SimpleDateFormat("yyyyMM-");
-            String roomName = "";
-            if(nameValue == null){
-                roomName = df.format(System.currentTimeMillis()) + "1";
-            } else {
-                roomName = df.format(System.currentTimeMillis()) + (nameValue + 1);
-            }
-            RoomDO roomDO = new RoomDO();
-            roomDO.setId(IdUtil.getId());
-            roomDO.setName(roomName);
-            roomDO.setPassword(password);
-            roomDO.setPeopleCount(peopleCount);
-            Integer effectRows = roomMapper.insert(roomDO);
-            if(effectRows != null && effectRows > 0){
-                for (RoleCardDO roleCardDO : roleCardDOList){
-                    if(roleCardDO.getIsSelected() == 1){
-                        RoomRoleCardDO roomRoleCardDO = new RoomRoleCardDO();
-                        roomRoleCardDO.setId(IdUtil.getId());
-                        roomRoleCardDO.setRoomId(roomDO.getId());
-                        roomRoleCardDO.setRoleCardId(roleCardDO.getId());
-                        roomRoleCardMapper.insert(roomRoleCardDO);
-                    }
-                }
-                request.getSession().setAttribute(SessionKey.ROOM_ID,roomDO.getId());//设置房间ID
-                modelMap.put("success",true);
-            } else {
-                throw new Exception("创建房间失败");
-            }
-        } catch (Exception e) {
+            RoomDO roomDO = roomService.generateRoom(password,cardCount - 3);
+            request.getSession().setAttribute(SessionKey.ROOM,roomDO);//设置房间实例
+            roomRoleCardService.generateRoomRoleCard(roomDO.getId(),roleCardDOList);//生成房间角色卡列表
+            modelMap.put("success",true);
+        } catch (MyException e) {
             modelMap.put("success",false);
             modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
         }
         return JSONObject.toJSONString(modelMap);
@@ -154,38 +123,21 @@ public class RoomController {
     public String loadRoom(ModelMap modelMap, HttpServletRequest request) {
         try {
             /**验证并生成用户*/
-            String roomId = (String)request.getSession().getAttribute(SessionKey.ROOM_ID);//获得房间ID
-            if(roomId == null){
-                throw new Exception("roomId未获取到");
+            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
+            if(roomDO == null){
+                throw new MyException("房间未登录");
             }
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
             if(userDO == null){
-                Integer nameValue = userMapper.selectMaxNameValue();
-                String userName = "";
-                if(nameValue == null){
-                    userName = "u-1";
-                } else {
-                    userName = "u-" + (nameValue + 1);
-                }
-                userDO = new UserDO();
-                userDO.setId(IdUtil.getId());
-                userDO.setName(userName);
-                Integer effectRows = userMapper.insert(userDO);
-                if(effectRows != null && effectRows > 0){
-                    userDO = userMapper.selectUserById(userDO.getId());
-                    request.getSession().setAttribute(SessionKey.USER, userDO);//设置用户实例
-                } else {
-                    throw new Exception("创建用户失败");
-                }
+                throw new MyException("用户未登录");
             }
             /**获得房间 以及 房间角色卡信息*/
-            RoomDO roomDO = roomMapper.selectRoomById(roomId);
-            List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomId);
+            List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
             if(roomDO == null){
-                throw new Exception("房间没找到");
+                throw new MyException("房间没找到");
             }
             if(roleCardDOList == null){
-                throw new Exception("房间角色卡列表没找到");
+                throw new MyException("房间角色卡列表没找到");
             }
             Map<String,Object> dataMap = new HashMap<>();
             dataMap.put("user",userDO);
@@ -193,9 +145,46 @@ public class RoomController {
             dataMap.put("roleCardList",roleCardDOList);
             modelMap.put("success",true);
             modelMap.put("data",dataMap);
-        } catch (Exception e) {
+        } catch (MyException e) {
             modelMap.put("success",false);
             modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * 加载座号
+     * @auther Horner 2017/11/26 11:42
+     * @param modelMap
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/loadSeatNum.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String loadSeatNum(ModelMap modelMap, HttpServletRequest request) {
+        try {
+            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
+            if(roomDO == null){
+                throw new MyException("房间未登录");
+            }
+            UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
+            if(userDO == null){
+                throw new MyException("用户未登录");
+            }
+            ActivityDO activityDO = activityService.findUnfinishedActivityByRoomId(roomDO.getId());
+            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityDO.getId());
+
+            Map<String,Object> dataMap = new HashMap<>();
+            dataMap.put("room",roomDO);
+            dataMap.put("activity",activityDO);
+            dataMap.put("activityDetailList",activityDetailDOList);
+            modelMap.put("success",true);
+            modelMap.put("data",dataMap);
+        } catch (MyException e) {
+            modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
         }
         return JSONObject.toJSONString(modelMap);

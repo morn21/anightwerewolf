@@ -1,6 +1,6 @@
 var roleCardList = [];//角色卡列表
 
-//导航1被点击时
+//导航1按钮
 $("#nav1").click(function(){
     $("#nav1").attr("class","active");
     $("#nav2").attr("class","");
@@ -8,7 +8,7 @@ $("#nav1").click(function(){
     $("#navDiv2").css("display","none");
 });
 
-//导航2被点击时
+//导航2按钮
 $("#nav2").click(function(){
     $("#nav1").attr("class","");
     $("#nav2").attr("class","active");
@@ -36,9 +36,32 @@ $("#intoRoomButton").click(function(){
     });
 });
 
+//描绘角色卡列表
+var describeRoleCardList = function(){
+    var html = "";
+    var cardCount = 0;
+    roleCardList.forEach(function (obj) {
+        html += "<button type='button' class='btn marginTop10 ";
+        if(obj.isSelected == 0){
+            html += "btn-default";
+        } else {
+            html += "btn-primary";
+            cardCount += obj.cardCount;//累计人数
+        }
+        html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
+        html += obj.name;
+        if(obj.cardCount == 2){
+            html += "*2";
+        }
+        html += "</button> ";
+    });
+    $("#roleCardList").html(html);
+    $("#peopleCount").html(cardCount - 3);
+};
+
 //点击角色卡按钮
 var clickRoleCardButton = function(id){
-    $.each(roleCardList,function(i,obj){
+    roleCardList.forEach(function(obj){
         if(obj.id == id){
             if(obj.isSelected == 1){
                 obj.isSelected = 0;
@@ -50,34 +73,11 @@ var clickRoleCardButton = function(id){
     describeRoleCardList();//描绘角色卡列表
 };
 
-//描绘角色卡列表
-var describeRoleCardList = function(){
-    var html = "";
-    var peopleCount = 0;
-    $.each(roleCardList,function(i,obj){
-        html += "<button type='button' class='btn marginTop10 ";
-        if(obj.isSelected == 0){
-            html += "btn-default";
-        } else{
-            html += "btn-primary";
-            peopleCount += obj.peopleCount;//累计人数
-        }
-        html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
-        html += obj.name;
-        if(obj.peopl$eCount == 2){
-            html += "*2";
-        }
-        html += "</button> ";
-    });
-    $("#roleCardList").html(html);
-    $("#peopleCount").html(peopleCount - 3);
-};
-
 //执行初始化
 var ini = function () {
     $.ajax({
         type : "POST",  //提交方式
-        url : "/roleCard/getAllList.json",//路径
+        url : "/roleCard/loadRoleCardList.json",//路径
         data : {},
         dataType : "json",
         success :  function(result){
@@ -89,7 +89,7 @@ var ini = function () {
     });
 };
 
-//点击确认创建房间按钮事件
+//点击确认创建房间按钮
 $("#confirmCreateRoomButton").click(function(){
     $.ajax({
         type : "POST",  //提交方式

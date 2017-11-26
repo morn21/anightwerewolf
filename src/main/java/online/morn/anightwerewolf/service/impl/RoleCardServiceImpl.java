@@ -5,6 +5,7 @@ import online.morn.anightwerewolf.DO.RoomRoleCardDO;
 import online.morn.anightwerewolf.mapper.RoleCardMapper;
 import online.morn.anightwerewolf.mapper.RoomRoleCardMapper;
 import online.morn.anightwerewolf.service.RoleCardService;
+import online.morn.anightwerewolf.util.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -25,7 +26,12 @@ public class RoleCardServiceImpl implements RoleCardService {
     private RoomRoleCardMapper roomRoleCardMapper;
 
     @Override
-    public List<RoleCardDO> findRoleCardByRoomId(String roomId) {
+    public List<RoleCardDO> findRoleCardList() throws MyException {
+        return roleCardMapper.selectRoleCardList();
+    }
+
+    @Override
+    public List<RoleCardDO> findRoleCardByRoomId(String roomId) throws MyException{
         List<RoleCardDO> roleCardDOList = null;
         List<RoomRoleCardDO> roomRoleCardDOList = roomRoleCardMapper.selectRoomRoleCardListByRoomId(roomId);
         if(!CollectionUtils.isEmpty(roomRoleCardDOList) && roomRoleCardDOList.size() > 0){

@@ -2,7 +2,8 @@ package online.morn.anightwerewolf.controller.json;
 
 import com.alibaba.fastjson.JSONObject;
 import online.morn.anightwerewolf.DO.RoleCardDO;
-import online.morn.anightwerewolf.mapper.RoleCardMapper;
+import online.morn.anightwerewolf.service.RoleCardService;
+import online.morn.anightwerewolf.util.MyException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
@@ -22,12 +23,18 @@ public class RoleCardController {
     private Logger logger = Logger.getLogger(RoleCardController.class);
 
     @Autowired
-    private RoleCardMapper roleCardMapper;
+    private RoleCardService roleCardService;
 
-    @RequestMapping(value = "/getAllList.json", method = {RequestMethod.GET , RequestMethod.POST})
-    public String getAllList(ModelMap modelMap) {
+    /**
+     * 加载角色卡列表
+     * @auther Horner 2017/11/26 11:40
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value = "/loadRoleCardList.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String loadRoleCardList(ModelMap modelMap) {
         try{
-            List<RoleCardDO> roleCardDOList = roleCardMapper.selectAllList();
+            List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardList();
             /*for(RoleCardDO ro : roleCardDOList){
                 System.out.println("public static final String " +ro.getId()+ " = \"" +ro.getId()+ "\";//" + ro.getName() + " orderNum:"+ro.getOrderNum() + " peopleCount:" +ro.getPeopleCount());
                 String roleId = ro.getId();
@@ -44,12 +51,15 @@ public class RoleCardController {
                 }
                 System.out.println("update role_card set id='" +strBuffer.toString() + "' where id='" + roleId + "';");
             }*/
-            if(roleCardDOList != null){
-                modelMap.put("data",roleCardDOList);
-                modelMap.put("success",true);
+            if(roleCardDOList == null){
+                throw new MyException("列表未找到");
             }
-        } catch (Exception e){
+            modelMap.put("data",roleCardDOList);
+            modelMap.put("success",true);
+        } catch (MyException e) {
             modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
         }
         return JSONObject.toJSONString(modelMap);

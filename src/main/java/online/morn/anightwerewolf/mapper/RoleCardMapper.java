@@ -17,7 +17,13 @@ public interface RoleCardMapper {
      * @auther Horner 2017/11/19 4:56
      * @return
      */
-    public List<RoleCardDO> selectAllList();
+    public List<RoleCardDO> selectRoleCardList();
 
+    /**
+     * 查询角色卡列表 根据ID列表
+     * @auther Horner 2017/11/26 11:53
+     * @param roleCardIdList
+     * @return
+     */
     public List<RoleCardDO> selectRoleCardListByIdList(@Param("roleCardIdList") List<String> roleCardIdList);
 }

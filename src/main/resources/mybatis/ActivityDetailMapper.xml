@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.morn.anightwerewolf.mapper.ActivityDetailMapper">
+    <insert id="insert" parameterType="online.morn.anightwerewolf.DO.ActivityDetailDO">
+        insert into activity_detail
+        (id,createTime,updateTime,userId,activityId,seatNum)
+        values
+        (#{activityDetailDO.id},now(),now(),#{activityDetailDO.userId},#{activityDetailDO.seatNum})
+    </insert>
+    <select id="selectActivityDetailListByActivityId" resultType="online.morn.anightwerewolf.DO.ActivityDetailDO">
+        select * from activity_detail
+        where activityId=#{activityId} and seatNum > 0
+        order by seatNum
+    </select>
+</mapper>

@@ -9,7 +9,7 @@ public class RoleCardDO {
     private String name;
     private Integer isSelected;
     private Integer orderNum;
-    private Integer peopleCount;
+    private Integer cardCount;
 
     public String getId() {
         return id;
@@ -43,11 +43,11 @@ public class RoleCardDO {
         this.orderNum = orderNum;
     }
 
-    public Integer getPeopleCount() {
-        return peopleCount;
+    public Integer getCardCount() {
+        return cardCount;
     }
 
-    public void setPeopleCount(Integer peopleCount) {
-        this.peopleCount = peopleCount;
+    public void setCardCount(Integer cardCount) {
+        this.cardCount = cardCount;
     }
 }
