@@ -36,4 +36,9 @@ public class UserServiceImpl implements UserService {
         }
         return userDO;
     }
+
+    @Override
+    public UserDO findUserById(String id) throws MyException {
+        return userMapper.selectUserById(id);
+    }
 }

@@ -1,9 +1,7 @@
 package online.morn.anightwerewolf.controller;
 
 import online.morn.anightwerewolf.DO.RoomDO;
-import online.morn.anightwerewolf.DO.UserDO;
 import online.morn.anightwerewolf.service.RoomService;
-import online.morn.anightwerewolf.service.UserService;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.SessionKey;
 import org.apache.commons.lang.StringUtils;
@@ -21,8 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 public class IndexController {
 
     @Autowired
-    private UserService userService;
-    @Autowired
     private RoomService roomService;
 
     @RequestMapping("/index")
@@ -31,18 +27,7 @@ public class IndexController {
     }
 
     @RequestMapping("/room")
-    public String room(HttpServletRequest request) {
-        try {
-            UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            if(userDO == null){
-                userDO = userService.generateUser();
-                request.getSession().setAttribute(SessionKey.USER, userDO);//设置用户实例
-            }
-        } catch (MyException e) {
-            e.printStackTrace();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+    public String room() {
         return "room";
     }
 

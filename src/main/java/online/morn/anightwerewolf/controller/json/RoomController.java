@@ -143,9 +143,6 @@ public class RoomController {
                 throw new MyException("房间未登录");
             }
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            if(userDO == null){
-                throw new MyException("用户未登录");
-            }
             /**获得房间 以及 房间角色卡信息*/
             List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
             if(roomDO == null){
@@ -185,9 +182,6 @@ public class RoomController {
                 throw new MyException("房间未登录");
             }
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            if(userDO == null){
-                throw new MyException("用户未登录");
-            }
             /**获得场次、场次明细*/
             ActivityDO activityDO = activityService.findUnfinishedActivityByRoomId(roomDO.getId());
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityDO.getId());
@@ -226,9 +220,6 @@ public class RoomController {
                 throw new MyException("座号不能为空");
             }
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            if(userDO == null){
-                throw new MyException("用户未登录");
-            }
             activityDetailService.addActivityDetail(userDO.getId(),activityId,seatNum);
             modelMap.put("success",true);
         } catch (MyException e) {
