@@ -46,13 +46,10 @@ var describeRoleCardList = function(){
             html += "btn-default";
         } else {
             html += "btn-primary";
-            cardCount += obj.cardCount;//累计人数
+            cardCount ++;//累计人数
         }
         html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
         html += obj.name;
-        if(obj.cardCount > 1){
-            html += "*" + obj.cardCount;
-        }
         html += "</button> ";
     });
     $("#roleCardList").html(html);

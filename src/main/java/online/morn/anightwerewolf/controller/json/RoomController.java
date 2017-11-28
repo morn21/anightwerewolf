@@ -92,7 +92,7 @@ public class RoomController {
             int cardCount = 0;
             for(RoleCardDO roleCardDO : roleCardDOList){
                 if(roleCardDO.getIsSelected() == 1){
-                    cardCount += roleCardDO.getCardCount();//累加人数
+                    cardCount ++;//累加人数
                 }
             }
             int peopleCount = cardCount - 3;
@@ -185,7 +185,15 @@ public class RoomController {
             /**获得场次、场次明细*/
             ActivityDO activityDO = activityService.findUnfinishedActivityByRoomId(roomDO.getId());
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityDO.getId());
+            /**查询当前用户是否已在本场次中锁定座号*/
+            boolean isLockSeatNum = false;
+            for(ActivityDetailDO activityDetailDO : activityDetailDOList){
+                if(userDO.getId().equals(activityDetailDO.getUserId())){
+                    isLockSeatNum = true;
+                }
+            }
             Map<String,Object> dataMap = new HashMap<>();
+            dataMap.put("isLockSeatNum",isLockSeatNum);//当前用户是否已在本场次中锁定座号
             dataMap.put("room",roomDO);
             dataMap.put("activity",activityDO);
             dataMap.put("activityDetailList",activityDetailDOList);

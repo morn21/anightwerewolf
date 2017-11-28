@@ -2,6 +2,7 @@ package online.morn.anightwerewolf.mapper;
 
 import online.morn.anightwerewolf.DO.RoleCardDO;
 import online.morn.anightwerewolf.DO.RoomDO;
+import online.morn.anightwerewolf.DO.UserDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

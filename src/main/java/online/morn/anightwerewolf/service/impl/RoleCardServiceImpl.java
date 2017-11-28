@@ -44,4 +44,15 @@ public class RoleCardServiceImpl implements RoleCardService {
         }
         return roleCardDOList;
     }
+
+    @Override
+    public RoleCardDO findRoleCardById(String id) throws MyException {
+        List<String> roleCardIdList = new ArrayList<>();
+        roleCardIdList.add(id);
+        List<RoleCardDO> roleCardDOList = roleCardMapper.selectRoleCardListByIdList(roleCardIdList);
+        if(!CollectionUtils.isEmpty(roleCardDOList)){
+            return roleCardDOList.get(0);
+        }
+        return null;
+    }
 }

@@ -3,14 +3,14 @@
 <mapper namespace="online.morn.anightwerewolf.mapper.ActivityMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.ActivityDO">
         insert into activity
-        (id,createTime,updateTime,roomId,isBegin)
+        (id,createTime,updateTime,roomId,status)
         values
-        (#{activityDO.id},now(),now(),#{activityDO.roomId},0)
+        (#{activityDO.id},now(),now(),#{activityDO.roomId},#{activityDO.status})
     </insert>
     <update id="updateById" parameterType="online.morn.anightwerewolf.DO.ActivityDO">
         update activity
         set updateTime=now(),
-        isBegin=#{activityDO.isBegin},
+        status=#{activityDO.status},
         winStatus=#{activityDO.winStatus}
         where id=#{activityDO.id}
     </update>

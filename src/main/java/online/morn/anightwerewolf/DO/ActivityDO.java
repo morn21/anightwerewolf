@@ -11,7 +11,8 @@ public class ActivityDO {
     private Date createTime;
     private Date updateTime;
     private String roomId;
-    private Integer isBegin;
+    private String status;
+    private Integer speakNum;
     private Integer winStatus;
 
     public String getId() {
@@ -54,11 +55,19 @@ public class ActivityDO {
         this.winStatus = winStatus;
     }
 
-    public Integer getIsBegin() {
-        return isBegin;
+    public String getStatus() {
+        return status;
     }
 
-    public void setIsBegin(Integer isBegin) {
-        this.isBegin = isBegin;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getSpeakNum() {
+        return speakNum;
+    }
+
+    public void setSpeakNum(Integer speakNum) {
+        this.speakNum = speakNum;
     }
 }

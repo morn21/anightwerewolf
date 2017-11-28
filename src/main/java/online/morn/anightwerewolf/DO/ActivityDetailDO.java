@@ -16,7 +16,7 @@ public class ActivityDetailDO {
     private String initialRoleCardId;
     private String finalRoleCardId;
     private String skillDescription;
-    private String voteNum;
+    private Integer voteNum;
 
     public String getId() {
         return id;
@@ -82,19 +82,19 @@ public class ActivityDetailDO {
         this.finalRoleCardId = finalRoleCardId;
     }
 
-    public String getVoteNum() {
-        return voteNum;
-    }
-
-    public void setVoteNum(String voteNum) {
-        this.voteNum = voteNum;
-    }
-
     public String getSkillDescription() {
         return skillDescription;
     }
 
     public void setSkillDescription(String skillDescription) {
         this.skillDescription = skillDescription;
+    }
+
+    public Integer getVoteNum() {
+        return voteNum;
+    }
+
+    public void setVoteNum(Integer voteNum) {
+        this.voteNum = voteNum;
     }
 }

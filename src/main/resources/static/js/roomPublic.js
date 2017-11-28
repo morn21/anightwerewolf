@@ -47,9 +47,6 @@ var iniRoomPublic = function () {
                 roleCardList.forEach(function (obj) {
                     html += "<span class='label label-info'>";
                     html += obj.name;
-                    if(obj.cardCount > 1){
-                        html += "*" + obj.cardCount;
-                    }
                     html += "</span> ";
                 });
                 $("#roomPublic_roleCardList").html(html);

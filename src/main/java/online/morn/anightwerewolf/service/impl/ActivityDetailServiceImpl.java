@@ -9,6 +9,7 @@ import online.morn.anightwerewolf.service.ActivityDetailService;
 import online.morn.anightwerewolf.service.ActivityService;
 import online.morn.anightwerewolf.service.RoleCardService;
 import online.morn.anightwerewolf.service.RoomService;
+import online.morn.anightwerewolf.util.ActivityStatus;
 import online.morn.anightwerewolf.util.IdUtil;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.RandomUtil;
@@ -53,7 +54,7 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
             randomFillRoleCard(activityDetailDOList,roleCardDOList);//随机填充角色卡
             /**执行更新本场次*/
             this.changeByList(activityDetailDOList);
-            activityDO.setIsBegin(1);//设置为已开始
+            activityDO.setStatus(ActivityStatus.NOT_SKILL);//未执行技能
             activityService.changeById(activityDO);
         }
         return activityDetailDO;
@@ -68,12 +69,10 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
      * @throws MyException
      */
     private List<ActivityDetailDO> randomFillRoleCard(List<ActivityDetailDO> activityDetailDOList, List<RoleCardDO> roleCardDOList) throws MyException {
-        /**伸展角色卡ID列表（根据cardCount伸展）*/
+        /**角色卡ID列表*/
         List<String> roleCardIdList = new ArrayList<>();
         for(RoleCardDO roleCardDO : roleCardDOList){
-            for(int i = 0 ; i < roleCardDO.getCardCount() ; i++){
-                roleCardIdList.add(roleCardDO.getId());
-            }
+            roleCardIdList.add(roleCardDO.getId());
         }
         if(activityDetailDOList.size() != roleCardIdList.size()){
             throw new MyException("随机填充角色卡出现数据异常，请联系管理员");

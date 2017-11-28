@@ -46,26 +46,30 @@ var ini = function(isNotCleanErrorMsg) {
             if(result.success){
                 var data = result.data;
                 $("#activityId").html(data.activity.id);//设置显示场次ID
-                seatNumList = [];//置空内存中的座号列表
-                var peopleCount = data.room.peopleCount;//房间人数
-                var activityDetailList = data.activityDetailList;//场次明细列表
-                for(var i = 0 ; i < peopleCount ; i++){
-                    var seatNum = i + 1;
-                    var isSelectedByOtherUser = false;
-                    activityDetailList.forEach(function(obj){
-                        if(seatNum == obj.seatNum){
-                            isSelectedByOtherUser = true;
-                        }
-                    });
-                    seatNumList.push({
-                        seatNum : seatNum,//座号
-                        isSelectedByOtherUser : isSelectedByOtherUser,//是否已被其它用户选择
-                        isSelected : false//当前用户是否选择
-                    });
-                }
-                describeSeatNumList();//描绘座号列表
-                if(isNotCleanErrorMsg == undefined || !isNotCleanErrorMsg){
-                    $("#errorMsgDiv").html("");
+                if(data.isLockSeatNum){//当前用户已在本场次中锁定座号
+                    window.location.href = "/activity?id=" + data.activity.id;
+                } else{//当前用户还没有在本场次中锁定座号
+                    seatNumList = [];//置空内存中的座号列表
+                    var peopleCount = data.room.peopleCount;//房间人数
+                    var activityDetailList = data.activityDetailList;//场次明细列表
+                    for(var i = 0 ; i < peopleCount ; i++){
+                        var seatNum = i + 1;
+                        var isSelectedByOtherUser = false;
+                        activityDetailList.forEach(function(obj){
+                            if(seatNum == obj.seatNum){
+                                isSelectedByOtherUser = true;
+                            }
+                        });
+                        seatNumList.push({
+                            seatNum : seatNum,//座号
+                            isSelectedByOtherUser : isSelectedByOtherUser,//是否已被其它用户选择
+                            isSelected : false//当前用户是否选择
+                        });
+                    }
+                    describeSeatNumList();//描绘座号列表
+                    if(isNotCleanErrorMsg == undefined || !isNotCleanErrorMsg){
+                        $("#errorMsgDiv").html("");
+                    }
                 }
             }
         }
