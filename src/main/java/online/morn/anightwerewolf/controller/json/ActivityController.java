@@ -62,7 +62,7 @@ public class ActivityController {
             }
             /**查到当前用户所在场次明细位置 以及 场次明细Map*/
             ActivityDetailDO myActivityDetailDO = null;
-            Map<String,ActivityDetailDO> detailByRoleCardIdMap = new HashMap<>();//以起始角色卡ID为Key 场次明细为值 的Map
+            Map<String,ActivityDetailDO> detailByRoleCardIdMap = new HashMap<>();//以起始角色牌ID为Key 场次明细为值 的Map
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             for(ActivityDetailDO detailDO : activityDetailDOList){
                 detailByRoleCardIdMap.put(detailDO.getInitialRoleCardId(),detailDO);//put Map
@@ -78,35 +78,37 @@ public class ActivityController {
             } else{//当前用户参与了本场次
                 /**添加本场次状态的相关数据*/
                 if(ActivityStatus.NOT_BEGIN.equals(status)){//未开始
+                    dataMap.put("seatNum",myActivityDetailDO.getSeatNum());
                     dataMap.put("peopleCount",roomDO.getPeopleCount());//本房间场次的总人数
                     dataMap.put("lockPeopleCount",activityDetailDOList.size());//已锁定座号的人数
-                } else if(ActivityStatus.NOT_SKILL.equals(status)) {//未执行技能
+                } else if(ActivityStatus.NOT_SKILL.equals(status)){//未执行技能
                     dataMap.put("cardCount",roomDO.getPeopleCount() + 3);//本房间场次的总牌数
-                    dataMap.put("myRoleCard",roleCardService.findRoleCardById(myActivityDetailDO.getInitialRoleCardId()));//当前用户的角色卡
+                    dataMap.put("myRoleCard",roleCardService.findRoleCardById(myActivityDetailDO.getInitialRoleCardId()));//当前用户的角色牌
                     List<RoleCardDO> RoleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
-                    int orderIndex = 1;//顺序下标
-                    for(RoleCardDO roleCardDO : RoleCardDOList){//按执行顺序遍历本房间的所有角色卡（模拟上帝宣读）
+                    int currentOrderNum = 1;//当前执行牌位序号
+                    for(RoleCardDO roleCardDO : RoleCardDOList){//按执行顺序遍历本房间的所有角色牌（模拟上帝宣读）
                         ActivityDetailDO orderDetail = detailByRoleCardIdMap.get(roleCardDO.getId());//执行顺序的场次明细
                         if(orderDetail.getSkillDescription() == null){//当前该执行技能的明细
                             boolean isNobody = true;//当前是否是轮到底牌角色执行
-                            boolean isCurrent = false;//是否轮到当前用户执行
+                            boolean isCurrentUser = false;//是否轮到当前用户执行
                             if(orderDetail.getSeatNum() > 0){//是用户
                                 isNobody = false;
                                 if(orderDetail.getId().equals(myActivityDetailDO.getId())){
-                                    isCurrent = true;
+                                    isCurrentUser = true;
                                 }
                             }
-                            dataMap.put("isNobody",isNobody);
-                            dataMap.put("isCurrent",isCurrent);
-                            dataMap.put("orderIndex",orderIndex);
+                            dataMap.put("isNobody",isNobody);//当前是否是轮到底牌角色执行
+                            dataMap.put("isCurrentUser",isCurrentUser);//是否轮到当前用户执行
+                            dataMap.put("currentRoleCard",roleCardDO);//当前执行技能的角色牌
+                            dataMap.put("currentOrderNum",currentOrderNum);//当前执行牌位序号
                             break;
                         }
-                        orderIndex++;
+                        currentOrderNum++;
                     }
-                } else if(ActivityStatus.NOT_VOTE.equals(status)) {//未投票
-
-                } else if(ActivityStatus.END.equals(status)) {//结束
-
+                } else if(ActivityStatus.NOT_VOTE.equals(status)){//未投票
+                    /////////////////////////////////////////////////
+                } else if(ActivityStatus.END.equals(status)){//结束
+                    /////////////////////////////////////////////////
                 }
             }
             dataMap.put("status",status);

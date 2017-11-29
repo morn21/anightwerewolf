@@ -1,13 +1,12 @@
 package online.morn.anightwerewolf.util;
 
 /**
- * 角色牌ID常量
- * @auther Horner 2017/11/24 1:42
+ * 角色ID常量
+ * @auther Horner 2017/11/29 19:23
  */
-public class RoleCardId {
+public class RoleId {
     public static final String DOPPELGANGER = "DOPPELGANGER";//化身幽灵 orderNum:1
-    public static final String WEREWOLF_1 = "WEREWOLF_1";//狼人1 orderNum:2
-    public static final String WEREWOLF_2 = "WEREWOLF_2";//狼人2 orderNum:3
+    public static final String WEREWOLF = "WEREWOLF";//狼人 orderNum:2
     public static final String MYSTIC_WOLF = "MYSTIC_WOLF";//狼先知 orderNum:4
     public static final String MINION = "MINION";//爪牙 orderNum:5
     public static final String DREAM_WOLF = "DREAM_WOLF";//贪睡狼 orderNum:6
@@ -20,9 +19,6 @@ public class RoleCardId {
     public static final String DRUNK = "DRUNK";//酒鬼 orderNum:13
     public static final String INSOMNIAC = "INSOMNIAC";//失眠者 orderNum:14
     public static final String HUNTER = "HUNTER";//猎人 orderNum:15
-    public static final String MASON_1 = "MASON_1";//守夜人1 orderNum:16
-    public static final String MASON_2 = "MASON_2";//守夜人2 orderNum:17
-    public static final String VILLAGER_1 = "VILLAGER_1";//村民1 orderNum:18
-    public static final String VILLAGER_2 = "VILLAGER_2";//村民2 orderNum:19
-    public static final String VILLAGER_3 = "VILLAGER_3";//村名3 orderNum:20
+    public static final String MASON = "MASON";//守夜人 orderNum:16
+    public static final String VILLAGER = "VILLAGER";//村民 orderNum:18
 }

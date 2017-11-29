@@ -7,13 +7,13 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 角色卡服务
+ * 角色牌服务
  * @auther Horner 2017/11/26 1:08
  */
 public interface RoleCardService {
 
     /**
-     * 查询全部角色卡
+     * 查询全部角色牌
      * @auther Horner 2017/11/19 4:56
      * @return
      * @throws MyException
@@ -21,7 +21,7 @@ public interface RoleCardService {
     public List<RoleCardDO> findRoleCardList() throws MyException;
 
     /**
-     * 查询角色卡根据房间ID
+     * 查询角色牌根据房间ID
      * @auther Horner 2017/11/26 1:11
      * @param roomId
      * @return
@@ -31,7 +31,7 @@ public interface RoleCardService {
 
 
     /**
-     * 查询角色卡 根据ID
+     * 查询角色牌 根据ID
      * @auther Horner 2017/11/28 23:15
      * @param id
      * @return

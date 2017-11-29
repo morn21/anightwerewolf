@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 房间角色卡服务
+ * 房间角色牌服务
  * @auther Horner 2017/11/26 15:39
  */
 @Service
@@ -33,7 +33,7 @@ public class RoomRoleCardServiceImpl implements RoomRoleCardService {
                 roomRoleCardDO.setRoleCardId(roleCardDO.getId());
                 Integer rows = roomRoleCardMapper.insert(roomRoleCardDO);
                 if(rows == null || rows == 0){
-                    throw new MyException("添加房间角色卡失败");
+                    throw new MyException("添加房间角色牌失败");
                 }
                 roomRoleCardDOList.add(roomRoleCardDO);
             }

@@ -51,7 +51,7 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
         if(roomDO.getPeopleCount() == activityDetailDOList.size()){
             executeAddThreeNobody(activityId,activityDetailDOList);//执行添加三张底牌 并填充给已有列表
             List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
-            randomFillRoleCard(activityDetailDOList,roleCardDOList);//随机填充角色卡
+            randomFillRoleCard(activityDetailDOList,roleCardDOList);//随机填充角色牌
             /**执行更新本场次*/
             this.changeByList(activityDetailDOList);
             activityDO.setStatus(ActivityStatus.NOT_SKILL);//未执行技能
@@ -61,7 +61,7 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
     }
 
     /**
-     * 随机填充角色卡
+     * 随机填充角色牌
      * @auther Horner 2017/11/27 0:30
      * @param activityDetailDOList
      * @param roleCardDOList
@@ -69,25 +69,25 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
      * @throws MyException
      */
     private List<ActivityDetailDO> randomFillRoleCard(List<ActivityDetailDO> activityDetailDOList, List<RoleCardDO> roleCardDOList) throws MyException {
-        /**角色卡ID列表*/
+        /**角色牌ID列表*/
         List<String> roleCardIdList = new ArrayList<>();
         for(RoleCardDO roleCardDO : roleCardDOList){
             roleCardIdList.add(roleCardDO.getId());
         }
         if(activityDetailDOList.size() != roleCardIdList.size()){
-            throw new MyException("随机填充角色卡出现数据异常，请联系管理员");
+            throw new MyException("随机填充角色牌出现数据异常，请联系管理员");
         }
-        /**获得两个随机列表 并给场次明细随机填充角色卡ID*/
+        /**获得两个随机列表 并给场次明细随机填充角色牌ID*/
         int listSize = activityDetailDOList.size();
         List<Integer> activityDetailIndexList = RandomUtil.generateRandomList(listSize);//场次明细随机下标列表
-        List<Integer> roleCardIdIndexList = RandomUtil.generateRandomList(roleCardIdList.size());//角色卡随机下标列表
+        List<Integer> roleCardIdIndexList = RandomUtil.generateRandomList(roleCardIdList.size());//角色牌随机下标列表
         for(int i = 0 ; i < listSize ; i++){
             Integer activityDetailIndex = activityDetailIndexList.get(i);//场次明细下标
-            Integer roleCardIdIndex = roleCardIdIndexList.get(i);//角色卡随机下标下标
+            Integer roleCardIdIndex = roleCardIdIndexList.get(i);//角色牌随机下标下标
             ActivityDetailDO activityDetailDO = activityDetailDOList.get(activityDetailIndex);
             String roleCardId = roleCardIdList.get(roleCardIdIndex);
-            activityDetailDO.setInitialRoleCardId(roleCardId);//初始角色卡ID
-            activityDetailDO.setFinalRoleCardId(roleCardId);//最终角色卡ID
+            activityDetailDO.setInitialRoleCardId(roleCardId);//初始角色牌ID
+            activityDetailDO.setFinalRoleCardId(roleCardId);//最终角色牌ID
         }
         return activityDetailDOList;
     }

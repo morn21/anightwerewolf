@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 角色卡
+ * 角色牌
  * @auther Horner 2017/11/26 0:21
  */
 @RequestMapping(value = "/roleCard")
@@ -26,7 +26,7 @@ public class RoleCardController {
     private RoleCardService roleCardService;
 
     /**
-     * 加载角色卡列表
+     * 加载角色牌列表
      * @auther Horner 2017/11/26 11:40
      * @param modelMap
      * @return

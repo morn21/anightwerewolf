@@ -1,7 +1,7 @@
 package online.morn.anightwerewolf.DO;
 
 /**
- * 房间角色卡表
+ * 房间角色牌表
  * @auther Horner 2017/11/26 0:28
  */
 public class RoomRoleCardDO {

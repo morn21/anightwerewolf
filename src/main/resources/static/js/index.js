@@ -1,4 +1,4 @@
-var roleCardList = [];//角色卡列表
+var roleCardList = [];//角色牌列表
 
 //导航1按钮
 $("#nav1").click(function(){
@@ -36,7 +36,7 @@ $("#intoRoomButton").click(function(){
     });
 });
 
-//描绘角色卡列表
+//描绘角色牌列表
 var describeRoleCardList = function(){
     var html = "";
     var cardCount = 0;
@@ -56,7 +56,7 @@ var describeRoleCardList = function(){
     $("#peopleCount").html(cardCount - 3);
 };
 
-//点击角色卡按钮
+//点击角色牌按钮
 var clickRoleCardButton = function(id){
     roleCardList.forEach(function(obj){
         if(obj.id == id){
@@ -67,7 +67,7 @@ var clickRoleCardButton = function(id){
             }
         }
     });
-    describeRoleCardList();//描绘角色卡列表
+    describeRoleCardList();//描绘角色牌列表
 };
 
 //执行初始化
@@ -80,7 +80,7 @@ var ini = function () {
         success :  function(result){
             if(result.success){
                 roleCardList = result.data;
-                describeRoleCardList();//描绘角色卡列表
+                describeRoleCardList();//描绘角色牌列表
             }
         }
     });

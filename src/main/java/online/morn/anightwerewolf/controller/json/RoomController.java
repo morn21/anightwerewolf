@@ -116,7 +116,7 @@ public class RoomController {
             /**生成房间*/
             RoomDO roomDO = roomService.generateRoom(password,cardCount - 3);
             request.getSession().setAttribute(SessionKey.ROOM,roomDO);//设置房间实例
-            roomRoleCardService.generateRoomRoleCard(roomDO.getId(),roleCardDOList);//生成房间角色卡列表
+            roomRoleCardService.generateRoomRoleCard(roomDO.getId(),roleCardDOList);//生成房间角色牌列表
             modelMap.put("success",true);
         } catch (MyException e) {
             modelMap.put("success",false);
@@ -143,13 +143,13 @@ public class RoomController {
                 throw new MyException("房间未登录");
             }
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            /**获得房间 以及 房间角色卡信息*/
+            /**获得房间 以及 房间角色牌信息*/
             List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
             if(roomDO == null){
                 throw new MyException("房间没找到");
             }
             if(roleCardDOList == null){
-                throw new MyException("房间角色卡列表没找到");
+                throw new MyException("房间角色牌列表没找到");
             }
             Map<String,Object> dataMap = new HashMap<>();
             dataMap.put("user",userDO);

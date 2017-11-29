@@ -25,6 +25,7 @@ public class MainFilter extends HttpServlet implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         System.out.println("==>MainFilter启动");
+        //System.setProperty("entityExpansionLimit", "6400000");
     }
 
     @Override
@@ -74,8 +75,10 @@ public class MainFilter extends HttpServlet implements Filter {
      */
     private Map<String,String> getCookieMap(HttpServletRequest request){
         Map<String,String> cookieMap = new HashMap<>();
-        for(Cookie cookie : request.getCookies()){
-            cookieMap.put(cookie.getName(),cookie.getValue());
+        if(request.getCookies() != null){
+            for(Cookie cookie : request.getCookies()){
+                cookieMap.put(cookie.getName(),cookie.getValue());
+            }
         }
         return cookieMap;
     }
