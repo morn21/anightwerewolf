@@ -15,6 +15,8 @@ public class ActivityDetailDO {
     private Integer seatNum;
     private String initialRoleCardId;
     private String finalRoleCardId;
+    private Integer skillStatus;
+    private String skillExtendInfo;
     private String skillDescription;
     private Integer voteNum;
 
@@ -96,5 +98,21 @@ public class ActivityDetailDO {
 
     public void setVoteNum(Integer voteNum) {
         this.voteNum = voteNum;
+    }
+
+    public Integer getSkillStatus() {
+        return skillStatus;
+    }
+
+    public void setSkillStatus(Integer skillStatus) {
+        this.skillStatus = skillStatus;
+    }
+
+    public String getSkillExtendInfo() {
+        return skillExtendInfo;
+    }
+
+    public void setSkillExtendInfo(String skillExtendInfo) {
+        this.skillExtendInfo = skillExtendInfo;
     }
 }

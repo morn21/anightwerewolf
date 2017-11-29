@@ -38,4 +38,12 @@ public interface RoleCardService {
      * @throws MyException
      */
     public RoleCardDO findRoleCardById(String id) throws MyException;
+
+    /**
+     * 查询角色牌列表 根据ID列表
+     * @auther Horner 2017/11/26 11:53
+     * @param roleCardIdList
+     * @return
+     */
+    public List<RoleCardDO> findRoleCardListByIdList(List<String> roleCardIdList);
 }

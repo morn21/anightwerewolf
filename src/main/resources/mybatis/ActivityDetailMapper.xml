@@ -3,15 +3,17 @@
 <mapper namespace="online.morn.anightwerewolf.mapper.ActivityDetailMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.ActivityDetailDO">
         insert into activity_detail
-        (id,createTime,updateTime,userId,activityId,seatNum)
+        (id,createTime,updateTime,userId,activityId,seatNum,skillStatus,skillExtendInfo)
         values
-        (#{activityDetailDO.id},now(),now(),#{activityDetailDO.userId},#{activityDetailDO.activityId},#{activityDetailDO.seatNum})
+        (#{activityDetailDO.id},now(),now(),#{activityDetailDO.userId},#{activityDetailDO.activityId},#{activityDetailDO.seatNum},#{activityDetailDO.skillStatus},#{activityDetailDO.skillExtendInfo})
     </insert>
     <update id="updateById" parameterType="online.morn.anightwerewolf.DO.ActivityDetailDO">
         update activity_detail
         set updateTime=now(),
         initialRoleCardId=#{activityDetailDO.initialRoleCardId},
         finalRoleCardId=#{activityDetailDO.finalRoleCardId},
+        skillStatus=#{activityDetailDO.skillStatus},
+        skillExtendInfo=#{activityDetailDO.skillExtendInfo},
         skillDescription=#{activityDetailDO.skillDescription},
         voteNum=#{activityDetailDO.voteNum}
         where id=#{activityDetailDO.id}

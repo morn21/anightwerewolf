@@ -26,7 +26,7 @@ $("#intoRoomButton").click(function(){
             password : $("#intoRoomPassword").val()
         },
         dataType : "json",
-        success :  function(result){
+        success : function(result){
             if(result.success){
                 window.location.href = "/room";
             } else{
@@ -77,7 +77,7 @@ var ini = function () {
         url : "/roleCard/loadRoleCardList.json",//路径
         data : {},
         dataType : "json",
-        success :  function(result){
+        success : function(result){
             if(result.success){
                 roleCardList = result.data;
                 describeRoleCardList();//描绘角色牌列表
@@ -96,7 +96,7 @@ $("#confirmCreateRoomButton").click(function(){
             roleCardListStr : JSON.stringify(roleCardList)
         },
         dataType : "json",
-        success :  function(result){
+        success : function(result){
             if(result.success){
                 window.location.href = "/room";
             } else{

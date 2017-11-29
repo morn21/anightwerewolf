@@ -24,6 +24,15 @@ public interface ActivityDetailService {
     public ActivityDetailDO addActivityDetail(String userId, String activityId, Integer seatNum) throws MyException;
 
     /**
+     * 修改场次 根据ID
+     * @auther Horner 2017/11/29 0:06
+     * @param activityDetailDO
+     * @return
+     * @throws MyException
+     */
+    public Integer changeById(ActivityDetailDO activityDetailDO) throws MyException;
+
+    /**
      * 修改场次明细 根据场次明细列表的ID
      * @auther Horner 2017/11/27 0:56
      * @param activityDetailDOList

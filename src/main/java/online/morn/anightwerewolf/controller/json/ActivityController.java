@@ -2,9 +2,7 @@ package online.morn.anightwerewolf.controller.json;
 
 import com.alibaba.fastjson.JSONObject;
 import online.morn.anightwerewolf.DO.*;
-import online.morn.anightwerewolf.service.ActivityDetailService;
-import online.morn.anightwerewolf.service.ActivityService;
-import online.morn.anightwerewolf.service.RoleCardService;
+import online.morn.anightwerewolf.service.*;
 import online.morn.anightwerewolf.util.ActivityStatus;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.SessionKey;
@@ -35,7 +33,11 @@ public class ActivityController {
     @Autowired
     private ActivityDetailService activityDetailService;
     @Autowired
+    private RoleService roleService;
+    @Autowired
     private RoleCardService roleCardService;
+    @Autowired
+    private RoomService roomService;
 
     /**
      * 询问场次状态
@@ -47,25 +49,25 @@ public class ActivityController {
     @RequestMapping(value = "/askActivityStatus.json", method = {RequestMethod.GET , RequestMethod.POST})
     public String askActivityStatus(ModelMap modelMap, HttpServletRequest request, String activityId) {
         try {
+            /**参数验证*/
+            if(StringUtils.isBlank(activityId)){
+                throw new MyException("场次ID不能为空");
+            }
+            /**Session取值*/
             UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
-            /**验证*/
             RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
             if(roomDO == null){
                 throw new MyException("房间未登录");
             }
-            if(StringUtils.isBlank(activityId)){
-                throw new MyException("场次ID不能为空");
-            }
+            /**场次信息*/
             ActivityDO activityDO = activityService.findActivityById(activityId);
             if(!activityDO.getRoomId().equals(roomDO.getId())){
                 throw new MyException("您不在本场次的房间内");
             }
-            /**查到当前用户所在场次明细位置 以及 场次明细Map*/
+            /**查到当前用户所在场次明细位置*/
             ActivityDetailDO myActivityDetailDO = null;
-            Map<String,ActivityDetailDO> detailByRoleCardIdMap = new HashMap<>();//以起始角色牌ID为Key 场次明细为值 的Map
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             for(ActivityDetailDO detailDO : activityDetailDOList){
-                detailByRoleCardIdMap.put(detailDO.getInitialRoleCardId(),detailDO);//put Map
                 if(userDO.getId().equals(detailDO.getUserId())){
                     myActivityDetailDO = detailDO;
                 }
@@ -78,33 +80,58 @@ public class ActivityController {
             } else{//当前用户参与了本场次
                 /**添加本场次状态的相关数据*/
                 if(ActivityStatus.NOT_BEGIN.equals(status)){//未开始
-                    dataMap.put("seatNum",myActivityDetailDO.getSeatNum());
+                    dataMap.put("mySeatNum",myActivityDetailDO.getSeatNum());//我的座号
                     dataMap.put("peopleCount",roomDO.getPeopleCount());//本房间场次的总人数
                     dataMap.put("lockPeopleCount",activityDetailDOList.size());//已锁定座号的人数
                 } else if(ActivityStatus.NOT_SKILL.equals(status)){//未执行技能
-                    dataMap.put("cardCount",roomDO.getPeopleCount() + 3);//本房间场次的总牌数
-                    dataMap.put("myRoleCard",roleCardService.findRoleCardById(myActivityDetailDO.getInitialRoleCardId()));//当前用户的角色牌
-                    List<RoleCardDO> RoleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
-                    int currentOrderNum = 1;//当前执行牌位序号
-                    for(RoleCardDO roleCardDO : RoleCardDOList){//按执行顺序遍历本房间的所有角色牌（模拟上帝宣读）
-                        ActivityDetailDO orderDetail = detailByRoleCardIdMap.get(roleCardDO.getId());//执行顺序的场次明细
-                        if(orderDetail.getSkillDescription() == null){//当前该执行技能的明细
-                            boolean isNobody = true;//当前是否是轮到底牌角色执行
-                            boolean isCurrentUser = false;//是否轮到当前用户执行
-                            if(orderDetail.getSeatNum() > 0){//是用户
-                                isNobody = false;
-                                if(orderDetail.getId().equals(myActivityDetailDO.getId())){
-                                    isCurrentUser = true;
-                                }
-                            }
-                            dataMap.put("isNobody",isNobody);//当前是否是轮到底牌角色执行
-                            dataMap.put("isCurrentUser",isCurrentUser);//是否轮到当前用户执行
-                            dataMap.put("currentRoleCard",roleCardDO);//当前执行技能的角色牌
-                            dataMap.put("currentOrderNum",currentOrderNum);//当前执行牌位序号
+                    dataMap.put("mySeatNum",myActivityDetailDO.getSeatNum());//我的座号
+                    /**本房间下 角色以及角色牌*/
+                    List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
+                    List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
+                    Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
+                    Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+                    dataMap.put("roleCount",roleDOList.size());//本房间的角色数量
+                    dataMap.put("cardCount",roleCardDOList.size());//本房间的卡牌数量
+                    /**我的初始 角色以及角色卡*/
+                    RoleCardDO myRoleCardDO = roleCardDOMap.get(myActivityDetailDO.getInitialRoleCardId());
+                    RoleDO myRoleDO = roleDOMap.get(myRoleCardDO.getRoleId());
+                    dataMap.put("myRole",myRoleDO);//我的角色牌
+                    dataMap.put("myRoleCard",myRoleCardDO);//我的角色牌
+                    /**我是否已执行技能*/
+                    boolean isSkillByMe = false;
+                    if(myActivityDetailDO.getSkillStatus() != 0){
+                        isSkillByMe = true;
+                    }
+                    dataMap.put("isSkillByMe",isSkillByMe);//我是否已执行技能
+                    /**当前正在执行技能的角色*/
+                    RoleDO currentRoleDO = roleService.findRoleById(activityDO.getSkillRoleId());
+                    dataMap.put("currentRole",currentRoleDO);//当前正在执行技能的角色
+                    /**已执行完技能 和 正在执行技能的角色数量*/
+                    int skillRoleCount = 1;
+                    for(RoleDO roleDO : roleDOList){
+                        if(roleDO.getId().equals(currentRoleDO.getId())){
                             break;
                         }
-                        currentOrderNum++;
+                        skillRoleCount++;
                     }
+                    dataMap.put("skillRoleCount",skillRoleCount);//已经执行完技能的角色数量
+                    /**当前正在执行技能的角色是否存在于底牌当中*/
+                    boolean isNobody = false;
+                    for(ActivityDetailDO detailDO : activityDetailDOList){
+                        if(detailDO.getSeatNum() < 0){//底牌
+                            RoleCardDO roleCardDO = roleCardDOMap.get(detailDO.getInitialRoleCardId());
+                            if(roleCardDO.getRoleId().equals(currentRoleDO.getId())){
+                                isNobody = true;
+                            }
+                        }
+                    }
+                    dataMap.put("isNobody",isNobody);//当前正在执行技能的角色是否存在于底牌当中
+                    /**当前用户是否需要执行技能*/
+                    boolean isSkillByCurrent = false;
+                    if(!isSkillByMe && currentRoleDO.getId().equals(myRoleDO.getId())){
+                        isSkillByCurrent = true;
+                    }
+                    dataMap.put("isSkillByCurrent",isSkillByCurrent);//当前用户是否需要执行技能
                 } else if(ActivityStatus.NOT_VOTE.equals(status)){//未投票
                     /////////////////////////////////////////////////
                 } else if(ActivityStatus.END.equals(status)){//结束
@@ -123,4 +150,87 @@ public class ActivityController {
         }
         return JSONObject.toJSONString(modelMap);
     }
+
+    /**
+     * 执行技能 -- 底牌标识为已执行技能
+     * @auther Horner 2017/11/29 23:36
+     * @param modelMap
+     * @param request
+     * @param activityId
+     * @return
+     */
+    @RequestMapping(value = "/executeSkillByNobody.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String executeSkillByNobody(ModelMap modelMap, HttpServletRequest request, String activityId) {
+        try {
+            /**参数验证*/
+            if(StringUtils.isBlank(activityId)){
+                throw new MyException("场次ID不能为空");
+            }
+            /**Session取值*/
+            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
+            if(roomDO == null){
+                throw new MyException("房间未登录");
+            }
+            /**场次信息*/
+            ActivityDO activityDO = activityService.findActivityById(activityId);
+            if(!activityDO.getRoomId().equals(roomDO.getId())){
+                throw new MyException("您不在本场次的房间内");
+            }
+            if(!ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
+                throw new MyException("场次状态错误");
+            }
+            /**标识当前正在执行技能的底牌为已执行*/
+            boolean isChangeFlag = false;//对数据库做出修改的旗帜
+            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
+            for(ActivityDetailDO detailDO : activityDetailDOList){
+                if(detailDO.getSeatNum() < 0 && detailDO.getSkillStatus() == 0){//找出未执行技能的底牌
+                    RoleCardDO roleCardDO = roleCardService.findRoleCardById(detailDO.getInitialRoleCardId());
+                    if(roleCardDO.getRoleId().equals(activityDO.getSkillRoleId())){
+                        detailDO.setSkillStatus(1);
+                        activityDetailService.changeById(detailDO);
+                        isChangeFlag = true;
+                    }
+                }
+            }
+            if(isChangeFlag){
+                activityService.changeActivityStatus(activityId);
+            }
+            modelMap.put("success",true);
+        } catch (MyException e) {
+            modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * （私有方法）制作角色Map --- key为角色ID
+     * @auther Horner 2017/11/29 19:58
+     * @param roleDOList
+     * @return
+     */
+    private Map<String,RoleDO> makeRoleMap(List<RoleDO> roleDOList){
+        Map<String,RoleDO> roleMap = new HashMap<>();
+        for(RoleDO roleDO : roleDOList){
+            roleMap.put(roleDO.getId(),roleDO);
+        }
+        return roleMap;
+    }
+
+    /**
+     * （私有方法）制作角色牌Map --- key为角色牌ID
+     * @auther Horner 2017/11/29 19:58
+     * @param roleCardDOList
+     * @return
+     */
+    private Map<String,RoleCardDO> makeRoleCardMap(List<RoleCardDO> roleCardDOList){
+        Map<String,RoleCardDO> roleCardMap = new HashMap<>();
+        for(RoleCardDO roleCardDO : roleCardDOList){
+            roleCardMap.put(roleCardDO.getId(),roleCardDO);
+        }
+        return roleCardMap;
+    }
+
 }

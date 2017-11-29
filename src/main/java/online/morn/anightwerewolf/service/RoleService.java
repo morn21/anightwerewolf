@@ -37,4 +37,13 @@ public interface RoleService {
      * @throws MyException
      */
     public RoleDO findRoleById(String id) throws MyException;
+
+    /**
+     * 查询角色 根据当前场次 正在执行技能的
+     * @auther Horner 2017/11/30 0:58
+     * @param activityId
+     * @return
+     * @throws MyException
+     */
+    public RoleDO findRoleByActivityId(String activityId) throws MyException;
 }

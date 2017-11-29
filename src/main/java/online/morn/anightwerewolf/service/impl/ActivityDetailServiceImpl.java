@@ -1,5 +1,6 @@
 package online.morn.anightwerewolf.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import online.morn.anightwerewolf.DO.ActivityDO;
 import online.morn.anightwerewolf.DO.ActivityDetailDO;
 import online.morn.anightwerewolf.DO.RoleCardDO;
@@ -9,7 +10,6 @@ import online.morn.anightwerewolf.service.ActivityDetailService;
 import online.morn.anightwerewolf.service.ActivityService;
 import online.morn.anightwerewolf.service.RoleCardService;
 import online.morn.anightwerewolf.service.RoomService;
-import online.morn.anightwerewolf.util.ActivityStatus;
 import online.morn.anightwerewolf.util.IdUtil;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.RandomUtil;
@@ -52,10 +52,9 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
             executeAddThreeNobody(activityId,activityDetailDOList);//执行添加三张底牌 并填充给已有列表
             List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());
             randomFillRoleCard(activityDetailDOList,roleCardDOList);//随机填充角色牌
-            /**执行更新本场次*/
             this.changeByList(activityDetailDOList);
-            activityDO.setStatus(ActivityStatus.NOT_SKILL);//未执行技能
-            activityService.changeById(activityDO);
+            /**执行更新本场次*/
+            activityService.changeActivityStatus(activityId);
         }
         return activityDetailDO;
     }
@@ -123,11 +122,18 @@ public class ActivityDetailServiceImpl implements ActivityDetailService {
         activityDetailDO.setUserId(userId);
         activityDetailDO.setActivityId(activityId);
         activityDetailDO.setSeatNum(seatNum);
+        activityDetailDO.setSkillStatus(0);
+        activityDetailDO.setSkillExtendInfo(new JSONObject().toJSONString());
         Integer rows = activityDetailMapper.insert(activityDetailDO);
         if(rows == null || rows == 0){
             throw new MyException("添加场次明细失败");
         }
         return activityDetailDO;
+    }
+
+    @Override
+    public Integer changeById(ActivityDetailDO activityDetailDO) throws MyException {
+        return activityDetailMapper.updateById(activityDetailDO);
     }
 
     @Override

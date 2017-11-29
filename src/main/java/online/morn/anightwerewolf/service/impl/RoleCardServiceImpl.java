@@ -55,4 +55,9 @@ public class RoleCardServiceImpl implements RoleCardService {
         }
         return null;
     }
+
+    @Override
+    public List<RoleCardDO> findRoleCardListByIdList(List<String> roleCardIdList) {
+        return roleCardMapper.selectRoleCardListByIdList(roleCardIdList);
+    }
 }

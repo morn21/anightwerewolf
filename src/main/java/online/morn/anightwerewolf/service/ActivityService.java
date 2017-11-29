@@ -35,4 +35,13 @@ public interface ActivityService {
      * @throws MyException
      */
     public ActivityDO findActivityById(String id) throws MyException;
+
+    /**
+     * 更新场次状态 根据场次ID
+     * @auther Horner 2017/11/30 3:28
+     * @param activityId
+     * @return
+     * @throws MyException
+     */
+    public Integer changeActivityStatus(String activityId) throws MyException;
 }

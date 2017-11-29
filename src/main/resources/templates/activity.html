@@ -14,7 +14,7 @@
     <div id="notBigin" style="display: none;">
         <div class="panel panel-default marginTop10">
             <div class="panel-heading">
-                已锁定座号<span id="notBigin_lockSeatName"></span>，
+                已锁定座号<span id="notBigin_mySeatNum"></span>，
                 还有<span id="notBigin_waitingPeopleCount"></span>人未锁定
             </div>
             <div class="panel-body">
@@ -27,18 +27,26 @@
     <div id="notSkill" style="display: none;">
         <div class="panel panel-default marginTop10">
             <h6 style="margin-left: 10px;">
-                你抽到的角色牌是【<span id="notSkill_myRoleCardName"></span>】
+                座号<span id="notSkill_mySeatNum"></span>，起始角色牌为【<span id="notSkill_myRoleCardName"></span>】
             </h6>
         </div>
         <div class="panel panel-default marginTop10">
             <div class="panel-heading">
-                正在执行技能的是【<span id="notSkill_currentRoleCardName"></span>】（<span id="notSkill_currentOrderNum"></span>/<span id="notSkill_cardCount"></span>）
+                正在执行技能的是【<span id="notSkill_currentRoleName"></span>】（<span id="notSkill_skillRoleCount"></span>/<span id="notSkill_roleCount"></span>）
             </div>
             <div class="panel-body">
-                <div id="notSkill_isCurrentUser_true" style="display: none;">
+                <div id="notSkill_isSkillByCurrent_true" style="display: none;">
+                    <!-- 化身幽灵 -->
+                    <div id="notSkill_DOPPELGANGER">
+
+                    </div>
+                    <!-- 狼人 -->
+                    <div id="notSkill_WEREWOLF">
+
+                    </div>
                     ////////看到这里就说明该执行技能了
                 </div>
-                <div id="notSkill_isCurrentUser_false" style="display: none;">
+                <div id="notSkill_isSkillByCurrent_false" style="display: none;">
                     <div class="progress">
                         <div id="notSkill_progress" class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">100%</div>
                     </div>
@@ -46,6 +54,7 @@
             </div>
         </div>
     </div>
+    <!--<audio autoplay="autoplay" src="/mp3/test.mp3"/>-->
 
     <div class="marginTop10" style="color:red;" id="errorMsgDiv"></div>
 </div>

@@ -12,6 +12,7 @@ public class ActivityDO {
     private Date updateTime;
     private String roomId;
     private String status;
+    private String skillRoleId;
     private Integer speakNum;
     private Integer winStatus;
 
@@ -69,5 +70,13 @@ public class ActivityDO {
 
     public void setSpeakNum(Integer speakNum) {
         this.speakNum = speakNum;
+    }
+
+    public String getSkillRoleId() {
+        return skillRoleId;
+    }
+
+    public void setSkillRoleId(String skillRoleId) {
+        this.skillRoleId = skillRoleId;
     }
 }

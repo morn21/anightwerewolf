@@ -11,6 +11,8 @@
         update activity
         set updateTime=now(),
         status=#{activityDO.status},
+        skillRoleId=#{activityDO.skillRoleId},
+        speakNum=#{activityDO.speakNum},
         winStatus=#{activityDO.winStatus}
         where id=#{activityDO.id}
     </update>
