@@ -60,6 +60,23 @@ var executeSkillByNobody = function () {
     });
 };
 
+//技能设置
+var skillSetting = {
+    peopleCount : 3,
+
+    disableSeatNumList : [],
+    needSelectedCount : 1,
+    SelectedSeatNumList : []
+};
+
+//描绘技能列表
+var describeSkillList = function(){
+    var html = "";
+    for(var i = 0 ; i < 3 ; i++){
+
+    }
+};
+
 //执行技能 -- 当前角色技能
 var executeSkillByCurrent = function(data){
     for(var key in roleIdJson){
