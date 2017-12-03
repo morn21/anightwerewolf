@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import online.morn.anightwerewolf.DO.*;
 import online.morn.anightwerewolf.service.*;
 import online.morn.anightwerewolf.util.MyException;
-import online.morn.anightwerewolf.util.SessionKey;
+import online.morn.anightwerewolf.util.enumeration.SessionKey;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

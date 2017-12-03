@@ -3,8 +3,7 @@ package online.morn.anightwerewolf;
 import online.morn.anightwerewolf.DO.UserDO;
 import online.morn.anightwerewolf.service.UserService;
 import online.morn.anightwerewolf.util.MyException;
-import online.morn.anightwerewolf.util.SessionKey;
-import org.springframework.beans.factory.annotation.Autowired;
+import online.morn.anightwerewolf.util.enumeration.SessionKey;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

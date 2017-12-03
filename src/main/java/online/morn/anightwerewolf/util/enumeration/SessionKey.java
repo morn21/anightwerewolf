@@ -1,4 +1,4 @@
-package online.morn.anightwerewolf.util;
+package online.morn.anightwerewolf.util.enumeration;
 
 public class SessionKey {
     public static final String ROOM = "ROOM";

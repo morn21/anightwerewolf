@@ -11,9 +11,9 @@ public class ActivityDO {
     private Date createTime;
     private Date updateTime;
     private String roomId;
+    private Integer speakNum;
     private String status;
     private String skillRoleId;
-    private Integer speakNum;
     private Integer winStatus;
 
     public String getId() {

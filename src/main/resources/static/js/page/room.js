@@ -4,21 +4,7 @@ var seatNumList = [];//座号列表
 var describeSeatNumList = function(){
     var html = "";
     seatNumList.forEach(function(obj){
-        html += "<button type='button' class='btn marginTop10 ";
-        if(obj.isSelectedByOtherUser || obj.isSelected){
-            html += "btn-primary";
-        } else {
-            html += "btn-default";
-        }
-        html += "' ";
-        if(obj.isSelectedByOtherUser){
-            html += "disabled='false'";
-        } else {
-            html += "onclick='clickSeatNumButton(" + obj.seatNum + ")'";
-        }
-        html += ">";
-        html += "座号" + obj.seatNum;
-        html += "</button> ";
+        html += basic.generateSelectButtonHtml("座号" + obj.seatNum, "clickSeatNumButton(" + obj.seatNum + ")", obj.isSelectedByOtherUser || obj.isSelected, obj.isSelectedByOtherUser);
     });
     $("#seatNumList").html(html);
 };

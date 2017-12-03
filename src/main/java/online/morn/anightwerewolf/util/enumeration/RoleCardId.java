@@ -1,4 +1,4 @@
-package online.morn.anightwerewolf.util;
+package online.morn.anightwerewolf.util.enumeration;
 
 /**
  * 角色牌ID常量

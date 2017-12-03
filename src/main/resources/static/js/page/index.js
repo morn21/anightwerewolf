@@ -2,6 +2,7 @@ var roleCardList = [];//角色牌列表
 
 //导航1按钮
 $("#nav1").click(function(){
+    $("#errorMsgDiv").html("");//清理错误信息
     $("#nav1").attr("class","active");
     $("#nav2").attr("class","");
     $("#navDiv1").css("display","block");
@@ -10,6 +11,7 @@ $("#nav1").click(function(){
 
 //导航2按钮
 $("#nav2").click(function(){
+    $("#errorMsgDiv").html("");//清理错误信息
     $("#nav1").attr("class","");
     $("#nav2").attr("class","active");
     $("#navDiv1").css("display","none");
@@ -41,16 +43,10 @@ var describeRoleCardList = function(){
     var html = "";
     var cardCount = 0;
     roleCardList.forEach(function (obj) {
-        html += "<button type='button' class='btn marginTop10 ";
-        if(obj.isSelected == 0){
-            html += "btn-default";
-        } else {
-            html += "btn-primary";
+        if(obj.isSelected){
             cardCount ++;//累计人数
         }
-        html += "' onclick='clickRoleCardButton(\"" + obj.id + "\")'>";
-        html += obj.name;
-        html += "</button> ";
+        html += basic.generateSelectButtonHtml(obj.name, "clickRoleCardButton('" + obj.id + "')", obj.isSelected);
     });
     $("#roleCardList").html(html);
     $("#peopleCount").html(cardCount - 3);
@@ -108,5 +104,6 @@ $("#confirmCreateRoomButton").click(function(){
 
 //初始化
 $(function () {
+    $("#intoRoomName").val(new Date().format("yyyyMM-"));
     ini();
 });

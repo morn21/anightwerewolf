@@ -9,7 +9,7 @@ import online.morn.anightwerewolf.service.ActivityDetailService;
 import online.morn.anightwerewolf.service.ActivityService;
 import online.morn.anightwerewolf.service.RoleService;
 import online.morn.anightwerewolf.service.RoomService;
-import online.morn.anightwerewolf.util.ActivityStatus;
+import online.morn.anightwerewolf.util.enumeration.ActivityStatus;
 import online.morn.anightwerewolf.util.IdUtil;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.RandomUtil;
@@ -38,9 +38,12 @@ public class ActivityServiceImpl implements ActivityService {
     public ActivityDO findUnfinishedActivityByRoomId(String roomId) throws MyException {
         ActivityDO activityDO = activityMapper.selectUnfinishedActivityByRoomId(roomId);
         if(activityDO == null){
+            RoomDO roomDO = roomService.findRoomById(roomId);
+            int speakNum = RandomUtil.generateRandom(roomDO.getPeopleCount()) + 1;
             activityDO = new ActivityDO();
             activityDO.setId(IdUtil.getId());
             activityDO.setRoomId(roomId);
+            activityDO.setSpeakNum(speakNum);
             activityDO.setStatus(ActivityStatus.NOT_BEGIN);//未开始
             Integer rows = activityMapper.insert(activityDO);
             if(rows == null || rows == 0){
@@ -73,14 +76,7 @@ public class ActivityServiceImpl implements ActivityService {
             if(roomDO.getPeopleCount() == (activityDetailDOList.size() - 3)){//符合开始条件
                 activityDO.setStatus(ActivityStatus.NOT_SKILL);//未执行技能
                 this.fillSkillRoleId(activityDO);
-                /*RoleDO roleDO = roleService.findRoleByActivityId(activityId);
-                if(roleDO == null){
-                    activityDO.setSkillRoleId(null);
-                } else{
-                    activityDO.setSkillRoleId(roleDO.getId());
-                }*/
                 this.changeById(activityDO);
-                //this.changeActivitySkillRoleIdById(activityId);
             }
         } else if(ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
             this.fillSkillRoleId(activityDO);
@@ -95,9 +91,7 @@ public class ActivityServiceImpl implements ActivityService {
             }
             if(isSkillOverFlag){
                 RoomDO roomDO = roomService.findRoomById(activityDO.getRoomId());
-                int speakNum = RandomUtil.generateRandom(roomDO.getPeopleCount()) + 1;
                 activityDO.setStatus(ActivityStatus.NOT_VOTE);
-                activityDO.setSpeakNum(speakNum);
             }
         }
         return this.changeById(activityDO);
