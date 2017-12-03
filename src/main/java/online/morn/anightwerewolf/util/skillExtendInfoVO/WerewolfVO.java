@@ -3,7 +3,7 @@ package online.morn.anightwerewolf.util.skillExtendInfoVO;
 import java.util.List;
 
 /**
- * 狼人角色扩展信息VO
+ * 【狼人】角色扩展信息VO
  * @auther Horner 2017/12/3 11:49
  */
 public class WerewolfVO {

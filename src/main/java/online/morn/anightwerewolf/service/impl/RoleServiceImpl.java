@@ -70,6 +70,9 @@ public class RoleServiceImpl implements RoleService {
                 roleCardIdList.add(detailDO.getInitialRoleCardId());
             }
         }
+        if(CollectionUtils.isEmpty(roleCardIdList)){
+            return null;
+        }
         List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardListByIdList(roleCardIdList);
         /**根据角色ID列表查角色对象列表*/
         List<String> roleIdList = new ArrayList<>();

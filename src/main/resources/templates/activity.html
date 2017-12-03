@@ -9,12 +9,14 @@
 <div class="panel-body">
     <div th:include="footer :: roomPublic"></div>
     <div class="panel panel-default marginTop10">
-        <h6 style="margin-left: 10px;">场次：<span id="activityId"></span></h6>
+        <div class="panel-body">
+            <h6>场次：<span id="activityId"></span></h6>
+        </div>
     </div>
     <div id="notBigin" style="display: none;">
         <div class="panel panel-default marginTop10">
             <div class="panel-heading">
-                已锁定座号<span id="notBigin_mySeatNum"></span>，
+                已锁定【座号<span id="notBigin_mySeatNum"></span>】，
                 还有<span id="notBigin_waitingPeopleCount"></span>人未锁定
             </div>
             <div class="panel-body">
@@ -24,22 +26,27 @@
             </div>
         </div>
     </div>
-    <div id="notSkill" style="display: none;">
-        <div class="panel panel-default marginTop10">
-            <h6 style="margin-left: 10px;">
-                座号<span id="notSkill_mySeatNum"></span>，起始角色牌为【<span id="notSkill_myRoleCardName"></span>】
-            </h6>
+    <div id="mySkillMessage" class="panel panel-default marginTop10" style="display: none;">
+        <div class="panel-body">
+            <div>
+                <h6>我的座号是【<span id="mySeatNum"></span>号】，起始角色牌为【<span id="myRoleCardName"></span>】</h6>
+            </div>
+            <div class="marginTop10" >
+                <h6 id="mySkillMessage_result"></h6>
+            </div>
         </div>
+    </div>
+    <div id="notSkill" style="display: none;">
         <div class="panel panel-default marginTop10">
             <div class="panel-heading">
                 正在执行技能的是【<span id="notSkill_currentRoleName"></span>】（<span id="notSkill_skillRoleCount"></span>/<span id="notSkill_roleCount"></span>）
             </div>
             <div class="panel-body">
                 <div id="notSkill_isSkillByCurrent_true" style="display: none;">
-                    <div id="notSkill_promptMsg"></div>
+                    <div><h6 id="notSkill_promptMsg"></h6></div>
                     <div id="notSkill_skillButtonList_nobody"></div>
                     <div id="notSkill_skillButtonList_body"></div>
-                    <div id="notSkill_confirmExecuteSkillButtonDiv" class="marginTop10">
+                    <div class="marginTop10">
                         <button class="btn btn-success" type="button" id="notSkill_confirmExecuteSkillButton">确认执行技能</button>
                     </div>
                 </div>
@@ -48,6 +55,13 @@
                         <div id="notSkill_progress" class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">100%</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="notVate" style="display: none;">
+        <div class="panel panel-default marginTop10">
+            <div class="panel-body">
+                <h6>现在由【<span id="notVate_speakNum"></span>号】开始发言</h6>
             </div>
         </div>
     </div>

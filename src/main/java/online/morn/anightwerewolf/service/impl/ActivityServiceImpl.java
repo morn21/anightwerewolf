@@ -81,7 +81,6 @@ public class ActivityServiceImpl implements ActivityService {
         } else if(ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
             this.fillSkillRoleId(activityDO);
             this.changeById(activityDO);
-
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             boolean isSkillOverFlag = true;
             for(ActivityDetailDO detailDO : activityDetailDOList){
