@@ -121,34 +121,34 @@ var skillSetting = {
 };
 
 //描绘技能列表
-var describeSkillButtonList = function(){
+var describeSkillButtonList = function(nobodyHtmlId,bodyHtmlId){
     {
         var html = "";
         for(var i = -1 ; i > (-1 - skillSetting.nobodyCount) ; i--){
             var showSeatNum = 0 - i;
             var seatNum = i;
-            html += basic.generateSelectButtonHtml("底牌" + showSeatNum,"clickSkillButton(" + seatNum + ")",skillSetting.isSelected(i),skillSetting.isDisabled(i));
+            html += basic.generateSelectButtonHtml("底牌" + showSeatNum,"clickSkillButton('" + nobodyHtmlId + "','" + bodyHtmlId + "'," + seatNum + ")",skillSetting.isSelected(i),skillSetting.isDisabled(i));
         }
-        $("#notSkill_skillButtonList_nobody").html(html);
+        $(nobodyHtmlId).html(html);
     }
     {
         var html = "";
         for(var i = 0 ; i < skillSetting.peopleCount ; i++){
             var seatNum = i + 1;
-            html += basic.generateSelectButtonHtml("座号" + seatNum,"clickSkillButton(" + seatNum + ")",skillSetting.isSelected(seatNum),skillSetting.isDisabled(seatNum));
+            html += basic.generateSelectButtonHtml("座号" + seatNum,"clickSkillButton('" + nobodyHtmlId + "','" + bodyHtmlId + "'," + seatNum + ")",skillSetting.isSelected(seatNum),skillSetting.isDisabled(seatNum));
         }
-        $("#notSkill_skillButtonList_body").html(html);
+        $(bodyHtmlId).html(html);
     }
 };
 
 //点击技能按钮
-var clickSkillButton = function(seatNum){
+var clickSkillButton = function(nobodyHtmlId,bodyHtmlId,seatNum){
     if(skillSetting.isSelected(seatNum)){
         skillSetting.removeSeatNumFromIsSelectedList(seatNum);//将座号从已选中列表中移除
     } else {
         skillSetting.addSeatNumFromIsSelectedList(seatNum);//添加座号到已选中列表
     }
-    describeSkillButtonList();//重新描绘技能列表
+    describeSkillButtonList(nobodyHtmlId,bodyHtmlId);//重新描绘技能列表
 };
 
 //初始化技能按钮列表
@@ -276,11 +276,12 @@ var iniSkillButtonList = function(myRoleId,peopleCount,mySeatNum,mySkillStatus,m
     }*/
     $("#notSkill_promptMsg").html(promptMsg);//技能提示信息
     $("#mySkillMessage_result").html(resultMsg);//技能结果信息
-    describeSkillButtonList();//重新描绘技能列表
+    describeSkillButtonList("#notSkill_skillButtonList_nobody","#notSkill_skillButtonList_body");//重新描绘技能列表
 };
 
 //确认执行技能
 var confirmExecuteSkill = function(){
+    $("#errorMsgDiv").html("");//清除错误信息
     if(skillSetting.isSelectedSeatNumList.length != skillSetting.needSelectedCount){
         $("#errorMsgDiv").html("你至少需要选择" + skillSetting.needSelectedCount + "张牌");
         return;
@@ -309,19 +310,61 @@ $("#notSkill_confirmExecuteSkillButton").click(function(){
     confirmExecuteSkill();//确认执行技能
 });
 
+//初始化投票按钮列表
+var iniVoteButttonList = function(peopleCount){
+    skillSetting.ini();
+    skillSetting.peopleCount = peopleCount;
+    describeSkillButtonList("#notVote_skillButtonList_nobody","#notVote_skillButtonList_body");//重新描绘技能列表
+};
+
+//确认投票
+var confirmExecuteVote = function(isSelectedSeatNum){
+    $.ajax({
+        type : "POST",  //提交方式
+        url : "/activity/executeVote.json",//路径
+        data : {
+            activityId : $("#activityId").html(),
+            isSelectedSeatNum : isSelectedSeatNum,
+        },
+        dataType : "json",
+        success :  function(result){
+            if(result.success){
+                ini();//调用重新初始化
+            } else{
+                $("#errorMsgDiv").html(result.msg);
+            }
+        }
+    });
+};
+
+//点击确认投票按钮
+$("#notVote_confirmExecuteVoteButton").click(function () {
+    $("#errorMsgDiv").html("");//清除错误信息
+    if(skillSetting.isSelectedSeatNumList.length != skillSetting.needSelectedCount){
+        $("#errorMsgDiv").html("你至少需要选择" + skillSetting.needSelectedCount + "张牌");
+        return;
+    }
+    confirmExecuteVote(skillSetting.isSelectedSeatNumList[0]);//确认投票
+});
+
+//点击弃票按钮
+$("#notVote_confirmExecuteAbstainedButton").click(function () {
+    confirmExecuteVote(0);//确认投票 0为弃票
+});
+
 //处理场次状态显示内容
 var processActivityStatusShowContent = function(data){
     if(data.status == "NOT_JOIN"){//当前用户没有参与本场次
-        showSetting(["#notBigin","#notSkill","#notVate"]);//显示设置
+        showSetting(["#notBigin","#notSkill","#notVote"]);//显示设置
         $("#errorMsgDiv").html("你并没有参与本场次");
     } else if(data.status == "NOT_BEGIN"){//未开始
-        showSetting(["#notBigin","#notSkill","#notVate"],["#notBigin"]);//显示"未开始"模块
+        showSetting(["#notBigin","#notSkill","#notVote"],["#notBigin"]);//显示"未开始"模块
         $("#notBigin_mySeatNum").html(data.mySeatNum);//我的座号
         $("#notBigin_waitingPeopleCount").html(data.peopleCount - data.lockPeopleCount);//等待锁定座号人数
         progressBarSetting("#notBigin_progress",data.lockPeopleCount / data.peopleCount);//进度条设置
         setTimeout(askActivityStatus,1000);
     } else if(data.status == "NOT_SKILL"){//未执行技能
-        showSetting(["#notBigin","#notSkill","#notVate"],["#notSkill"]);//显示"未执行技能"模块
+        showSetting(["#notBigin","#notSkill","#notVote"],["#notSkill"]);//显示"未执行技能"模块
         showSetting([],["#mySkillMessage"]);//显示我的信息
         if(data.isNobody){//当前正在执行技能的角色是否存在于底牌当中
             setTimeout(executeSkillByNobody,1000);//执行技能 -- 底牌标识为已执行技能
@@ -342,11 +385,33 @@ var processActivityStatusShowContent = function(data){
             setTimeout(askActivityStatus,1000);
         }
     } else if(data.status == "NOT_VOTE"){//未投票
-        showSetting(["#notBigin","#notSkill","#notVate"],["#notVate"]);//显示"未执行技能"模块
+        showSetting(["#notBigin","#notSkill","#notVote"],["#notVote"]);//显示"未执行技能"模块
         showSetting([],["#mySkillMessage"]);//显示我的信息
-        $("#notVate_speakNum").html(data.speakNum);
+        $("#notVote_speakNum").html(data.speakNum);
+        $("#mySeatNum").html(data.mySeatNum);//我的座号
+        $("#myRoleCardName").html(data.myRoleCard.name);//我的角色牌名称
+        var myVoteNum = data.myVoteNum;//我的投票号
+        if(myVoteNum == undefined){//未投票时
+            showSetting(["#notVote_isNoteVote_false"],["#notVote_isNoteVote_true"]);//显示设置
+            iniSkillButtonList(data.myRole.id, data.peopleCount,data.mySeatNum,data.mySkillStatus,data.mySkillExtendInfo);//初始化技能按钮列表
+            iniVoteButttonList(data.peopleCount);//初始化投票按钮列表
+        } else{//已投票时
+            showSetting(["#notVote_isNoteVote_true"],["#notVote_isNoteVote_false"]);//显示设置
+            var promptMsg = "我";
+            if(myVoteNum < 0){
+                promptMsg += "投了【底牌" + (0 - myVoteNum) + "】";
+            } else if(myVoteNum > 0){
+                promptMsg += "投了【" + myVoteNum + "号】";
+            } else if(myVoteNum == 0){
+                promptMsg += "选择了【弃票】";
+            }
+            promptMsg += "，还有" + (data.peopleCount - data.voteCount) + "人未投票";
+            $("#notVote_promptMsg").html(promptMsg);
+            progressBarSetting("#notVote_progress",data.voteCount / data.peopleCount);//进度条设置
+            setTimeout(askActivityStatus,1000);
+        }
     } else if(data.status == "END"){//结束
-        /////////////////////////////////////////////////
+        window.location.href = "/result?activityId=" + $("#activityId").html();
     }
 };
 

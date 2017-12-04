@@ -70,18 +70,17 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public Integer changeActivityStatus(String activityId) throws MyException {
         ActivityDO activityDO = this.findActivityById(activityId);
+        List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
         if(ActivityStatus.NOT_BEGIN.equals(activityDO.getStatus())){
-            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             RoomDO roomDO = roomService.findRoomById(activityDO.getRoomId());
             if(roomDO.getPeopleCount() == (activityDetailDOList.size() - 3)){//符合开始条件
                 activityDO.setStatus(ActivityStatus.NOT_SKILL);//未执行技能
-                this.fillSkillRoleId(activityDO);
+                this.computeSkillRoleId(activityDO);//计算当前正在执行技能的角色 并写给场次信息中
                 this.changeById(activityDO);
             }
         } else if(ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
-            this.fillSkillRoleId(activityDO);
+            this.computeSkillRoleId(activityDO);//计算当前正在执行技能的角色 并写给场次信息中
             this.changeById(activityDO);
-            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             boolean isSkillOverFlag = true;
             for(ActivityDetailDO detailDO : activityDetailDOList){
                 if(detailDO.getSkillStatus() == 0){
@@ -89,14 +88,31 @@ public class ActivityServiceImpl implements ActivityService {
                 }
             }
             if(isSkillOverFlag){
-                RoomDO roomDO = roomService.findRoomById(activityDO.getRoomId());
+                //RoomDO roomDO = roomService.findRoomById(activityDO.getRoomId());
                 activityDO.setStatus(ActivityStatus.NOT_VOTE);
+            }
+        } else if(ActivityStatus.NOT_VOTE.equals(activityDO.getStatus())){
+            boolean isVoteOverFlag = true;
+            for(ActivityDetailDO detailDO : activityDetailDOList){
+                if(detailDO.getSeatNum() > 0 && detailDO.getVoteNum() == null){//场上有一个未投票的都算未结束
+                    isVoteOverFlag = false;
+                }
+            }
+            if(isVoteOverFlag){
+                activityDO.setStatus(ActivityStatus.END);
             }
         }
         return this.changeById(activityDO);
     }
 
-    private ActivityDO fillSkillRoleId(ActivityDO activityDO) throws MyException {
+    /**
+     * 【私有方法】计算当前正在执行技能的角色 并写给场次信息中
+     * @auther Horner 2017/12/5 0:39
+     * @param activityDO
+     * @return
+     * @throws MyException
+     */
+    private ActivityDO computeSkillRoleId(ActivityDO activityDO) throws MyException {
         RoleDO roleDO = roleService.findRoleByActivityId(activityDO.getId());
         if(roleDO == null){
             activityDO.setSkillRoleId(null);

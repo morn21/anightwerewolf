@@ -131,10 +131,35 @@ public class ActivityController {
                         isSkillByCurrent = true;
                     }
                     dataMap.put("isSkillByCurrent",isSkillByCurrent);//当前用户是否需要执行技能
+                    /**我的技能状态*/
                     dataMap.put("mySkillStatus",myActivityDetailDO.getSkillStatus());//我的技能状态
                     dataMap.put("mySkillExtendInfo",JSONObject.parse(myActivityDetailDO.getSkillExtendInfo()));//我的技能扩展信息
                 } else if(ActivityStatus.NOT_VOTE.equals(status)){//未投票
-                    dataMap.put("speakNum",activityDO.getSpeakNum());//我的座号
+                    dataMap.put("speakNum",activityDO.getSpeakNum());//发言号
+                    dataMap.put("peopleCount",roomDO.getPeopleCount());//本房间场次的总人数
+                    dataMap.put("mySeatNum",myActivityDetailDO.getSeatNum());//我的座号
+                    /**本房间下 角色以及角色牌*/
+                    List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
+                    List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
+                    Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
+                    Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+                    /**我的初始 角色以及角色卡*/
+                    RoleCardDO myRoleCardDO = roleCardDOMap.get(myActivityDetailDO.getInitialRoleCardId());
+                    RoleDO myRoleDO = roleDOMap.get(myRoleCardDO.getRoleId());
+                    dataMap.put("myRole",myRoleDO);//我的角色牌
+                    dataMap.put("myRoleCard",myRoleCardDO);//我的角色牌
+                    /**我的技能状态*/
+                    dataMap.put("mySkillStatus",myActivityDetailDO.getSkillStatus());//我的技能状态
+                    dataMap.put("mySkillExtendInfo",JSONObject.parse(myActivityDetailDO.getSkillExtendInfo()));//我的技能扩展信息
+                    /**投票状态*/
+                    int voteCount = 0;//已投票的数量
+                    for(ActivityDetailDO detail : activityDetailDOList){
+                        if(detail.getSeatNum() > 0 && detail.getVoteNum() != null){
+                            voteCount++;
+                        }
+                    }
+                    dataMap.put("myVoteNum",myActivityDetailDO.getVoteNum());//我的投票号
+                    dataMap.put("voteCount",voteCount);//已投票数量
                 } else if(ActivityStatus.END.equals(status)){//结束
                     /////////////////////////////////////////////////
                 }
@@ -404,7 +429,67 @@ public class ActivityController {
     }
 
     /**
-     * （私有方法）执行换牌
+     * 执行投票
+     * @auther Horner 2017/12/5 0:25
+     * @param modelMap
+     * @param request
+     * @param activityId
+     * @param isSelectedSeatNum 选中的座号
+     * @return
+     */
+    @RequestMapping(value = "/executeVote.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String executeVote(ModelMap modelMap, HttpServletRequest request, String activityId, Integer isSelectedSeatNum) {
+        try{
+            /**参数验证*/
+            if(StringUtils.isBlank(activityId)){
+                throw new MyException("场次ID不能为空");
+            }
+            if(isSelectedSeatNum == null){
+                throw new MyException("选中座号不能为空");
+            }
+            /**Session取值*/
+            UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
+            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
+            if(roomDO == null){
+                throw new MyException("房间未登录");
+            }
+            /**场次信息*/
+            ActivityDO activityDO = activityService.findActivityById(activityId);
+            if(!activityDO.getRoomId().equals(roomDO.getId())){
+                throw new MyException("您不在本场次的房间内");
+            }
+            if(!ActivityStatus.NOT_VOTE.equals(activityDO.getStatus())){
+                throw new MyException("场次状态错误");
+            }
+            /**场次明细信息*/
+            ActivityDetailDO myActivityDetailDO = null;
+            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
+            for(ActivityDetailDO detailDO : activityDetailDOList){
+                if(userDO.getId().equals(detailDO.getUserId())){
+                    myActivityDetailDO = detailDO;
+                }
+            }
+            if(myActivityDetailDO == null){
+                throw new MyException("您不存在于本场次中");
+            }
+            myActivityDetailDO.setVoteNum(isSelectedSeatNum);
+            activityDetailService.changeById(myActivityDetailDO);//修改场次明细 -- 投票号
+            int rows = activityService.changeActivityStatus(activityId);//更新场次状态 根据场次ID
+            if(rows == 1){//说明本场次结束 可以计算输赢结果了
+                ///////////////////////// 在这里处理胜利状态
+            }
+            modelMap.put("success",true);
+        } catch (MyException e) {
+            modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * 【私有方法】执行换牌
      * @auther Horner 2017/12/3 17:37
      * @param detailDO1
      * @param detailDO2
@@ -418,7 +503,7 @@ public class ActivityController {
     }
 
     /**
-     * （私有方法）执行查牌
+     * 【私有方法】执行查牌
      * @auther Horner 2017/12/3 17:27
      * @param activityDetailDOList
      * @param roleDOMap
@@ -444,7 +529,7 @@ public class ActivityController {
     }
 
     /**
-     * json字符串转Java对象
+     * 【私有方法】json字符串转Java对象
      * @auther Horner 2017/12/3 13:19
      * @param jsonStr
      * @param tClass
@@ -462,7 +547,7 @@ public class ActivityController {
     }*/
 
     /**
-     * （私有方法）制作角色Map --- key为角色ID
+     * 【私有方法】制作角色Map --- key为角色ID
      * @auther Horner 2017/11/29 19:58
      * @param roleDOList
      * @return
@@ -476,7 +561,7 @@ public class ActivityController {
     }
 
     /**
-     * （私有方法）制作角色牌Map --- key为角色牌ID
+     * 【私有方法】制作角色牌Map --- key为角色牌ID
      * @auther Horner 2017/11/29 19:58
      * @param roleCardDOList
      * @return

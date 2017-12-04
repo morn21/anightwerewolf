@@ -21,9 +21,14 @@ public class IndexController {
     @Autowired
     private RoomService roomService;
 
-    @RequestMapping("/index")
+    @RequestMapping(value = {"/","/index"})
     public String index() {
         return "index";
+    }
+
+    @RequestMapping("/start")
+    public String start() {
+        return "start";
     }
 
     @RequestMapping("/room")
@@ -34,6 +39,11 @@ public class IndexController {
     @RequestMapping("/activity")
     public String activity() {
         return "activity";
+    }
+
+    @RequestMapping("/result")
+    public String result() {
+        return "result";
     }
 
     @RequestMapping("/intoRoom")
