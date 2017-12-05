@@ -476,7 +476,14 @@ public class ActivityController {
             activityDetailService.changeById(myActivityDetailDO);//修改场次明细 -- 投票号
             int rows = activityService.changeActivityStatus(activityId);//更新场次状态 根据场次ID
             if(rows == 1){//说明本场次结束 可以计算输赢结果了
-                ///////////////////////// 在这里处理胜利状态
+                activityDO = activityService.findActivityById(activityId);
+                if(activityDO.getStatus().equals(ActivityStatus.END)){
+                    activityDO.setWinStatus(0);////////////////////////////暂时先把已经结束的设置胜利状态为0
+                }
+                /*List<ActivityDetailDO> resultDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
+                for(ActivityDetailDO detailDO : resultDetailDOList){
+
+                }*/
             }
             modelMap.put("success",true);
         } catch (MyException e) {
@@ -486,6 +493,72 @@ public class ActivityController {
             e.printStackTrace();
         }
         return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * 查看场次结果列表
+     * @auther Horner 2017/12/5 23:40
+     * @param modelMap
+     * @param request
+     * @param activityId
+     * @return
+     */
+    @RequestMapping(value = "/findResultList.json", method = {RequestMethod.GET , RequestMethod.POST})
+    public String findResultList(ModelMap modelMap, HttpServletRequest request, String activityId) {
+        try{
+            /**参数验证*/
+            if(StringUtils.isBlank(activityId)){
+                throw new MyException("场次ID不能为空");
+            }
+            /**Session取值*/
+            //UserDO userDO = (UserDO)request.getSession().getAttribute(SessionKey.USER);//获得用户实例
+            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
+            /**本房间下 角色以及角色牌*/
+            //List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
+            List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
+            //Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
+            Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
+            activityDetailDOList = this.sortingDetail(activityDetailDOList);//【私有方法】场次明细排序
+            List<Map<String,Object>> resultList = new ArrayList<>();//结果列表
+            for(ActivityDetailDO detailDO : activityDetailDOList){
+                Map<String,Object> resultMap = new HashMap<>();
+                resultMap.put("seatNum",detailDO.getSeatNum());
+                resultMap.put("initialRoleCardName",roleCardDOMap.get(detailDO.getInitialRoleCardId()).getName());
+                resultMap.put("finalRoleCardName",roleCardDOMap.get(detailDO.getFinalRoleCardId()).getName());
+                resultMap.put("voteNum",detailDO.getVoteNum());
+                resultList.add(resultMap);
+            }
+            modelMap.put("data",resultList);
+            modelMap.put("success",true);
+        } catch (MyException e) {
+            modelMap.put("success",false);
+            modelMap.put("msg",e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return JSONObject.toJSONString(modelMap);
+    }
+
+    /**
+     * 【私有方法】场次明细排序
+     * @auther Horner 2017/12/5 23:52
+     * @param activityDetailDOList
+     * @return
+     */
+    private List<ActivityDetailDO> sortingDetail(List<ActivityDetailDO> activityDetailDOList){
+        Map<Integer,ActivityDetailDO> detailMap = new HashMap<>();
+        for(ActivityDetailDO detailDO : activityDetailDOList){
+            detailMap.put(detailDO.getSeatNum(),detailDO);
+        }
+        List<ActivityDetailDO> newDetailList = new ArrayList<>();
+        for(int i = -1; i > -4 ; i--){
+            newDetailList.add(detailMap.get(i));
+        }
+        for(int i = 1 ; i < activityDetailDOList.size() - 2 ; i++){
+            newDetailList.add(detailMap.get(i));
+        }
+        return newDetailList;
     }
 
     /**

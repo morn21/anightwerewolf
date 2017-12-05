@@ -3,8 +3,3 @@
 $("#startGameButton").click(function () {
     window.location.href = "start";
 });
-
-//点击背景介绍按钮
-$("#bgIntroductionButton").click(function () {
-
-});

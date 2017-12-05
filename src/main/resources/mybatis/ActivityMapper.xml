@@ -17,7 +17,7 @@
     </update>
     <select id="selectUnfinishedActivityByRoomId" resultType="online.morn.anightwerewolf.DO.ActivityDO">
         select * from activity
-        where roomId=#{roomId} and winStatus is null
+        where roomId=#{roomId} and status != 'END'
         order by createTime desc
     </select>
     <select id="selectActivityById" resultType="online.morn.anightwerewolf.DO.ActivityDO">

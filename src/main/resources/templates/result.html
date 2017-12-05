@@ -8,7 +8,25 @@
 
 <div class="panel-body">
     <div th:include="footer :: roomPublic"></div>
-    /////////////游戏结束！！至于这个页的内容嘛，未完待续。。。
+    <div class="panel panel-default marginTop10">
+        <div class="panel-body">
+            <h6>场次：<span id="activityId"></span></h6>
+        </div>
+    </div>
+    <div class="marginTop10">
+        <ul class="list-group" id="resultList">
+            <!--
+            <li class="list-group-item">底牌1：【狼人1】=>【狼人2】，投【底牌1】</li>
+            <li class="list-group-item">底牌2：【捣蛋鬼】=>【见习预言家】，弃票</li>
+            <li class="list-group-item">【底牌3】</li>
+            <li class="list-group-item">【座号1】</li>
+            <li class="list-group-item">【座号2】</li>
+            -->
+        </ul>
+    </div>
+    <div class="marginTop10">
+        <button class="btn btn-success" type="button" id="backRoomButtom">返回房间</button>
+    </div>
 </div>
 
 </body>

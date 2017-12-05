@@ -17,13 +17,6 @@ var roleIdJson = {
     VILLAGER : "VILLAGER"//村民 orderNum:18
 };
 
-//获得get参数
-var getGetQueryString = function (name){
-    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-    var r = window.location.search.substr(1).match(reg);
-    if(r!=null)return  unescape(r[2]); return null;
-};
-
 //进度条设置
 var progressBarSetting = function(domId,progressValue){
     var percentage = parseInt(progressValue * 100) + "%";
@@ -411,7 +404,7 @@ var processActivityStatusShowContent = function(data){
             setTimeout(askActivityStatus,1000);
         }
     } else if(data.status == "END"){//结束
-        window.location.href = "/result?activityId=" + $("#activityId").html();
+        window.location.href = "/result?id=" + $("#activityId").html();
     }
 };
 
@@ -425,7 +418,6 @@ var askActivityStatus = function(){
         },
         dataType : "json",
         success :  function(result){
-            //debugger;
             if(result.success){
                 var data = result.data;
                 processActivityStatusShowContent(data);//处理场次状态显示内容
@@ -438,7 +430,7 @@ var askActivityStatus = function(){
 
 //执行初始化
 var ini = function(){
-    var activityId = getGetQueryString("id");
+    var activityId = basic.getGetQueryString("id");
     $("#activityId").html(activityId);
     askActivityStatus();//询问场次状态
 };
