@@ -8,6 +8,7 @@ public class RoleDO {
     private String id;
     private String name;
     private Integer orderNum;
+    private String introduction;
 
     public String getId() {
         return id;
@@ -31,5 +32,13 @@ public class RoleDO {
 
     public void setOrderNum(Integer orderNum) {
         this.orderNum = orderNum;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 }

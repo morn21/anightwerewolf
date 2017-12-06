@@ -37,9 +37,9 @@ var iniRoomPublic = function () {
                 $("#roomPublic_roomName").html(" " + room.name);
                 $("#roomPublic_userName").html(" " + user.name);
                 $("#roomPublic_roomQrCodeDiv").qrcode({
-                    render: "table", //table方式
+                    //render: "table", //table方式
                     width: 200, //宽度
-                    height:200, //高度
+                    height: 205, //高度
                     text: generateQrCodeUrl(room.id)//生成二维码地址
                 });
                 $("#roomPublic_peopleCount").html(room.peopleCount);

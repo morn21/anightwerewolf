@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="online.morn.anightwerewolf.mapper.RoomMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.RoomDO">
-        insert into room
+        insert into v_room
         (id,createTime,name,password,peopleCount)
         values
         (#{roomDO.id},now(),#{roomDO.name},#{roomDO.password},#{roomDO.peopleCount})
     </insert>
     <select id="selectMaxNameValue" resultType="java.lang.Integer">
-        select max(substring_index(name,'-',-1)+0) from room
+        select max(substring_index(name,'-',-1)+0) from v_room
         where name like date_format(now(),'%Y%m-%')
     </select>
     <select id="selectRoomByNameAndPassword" resultType="online.morn.anightwerewolf.DO.RoomDO">
-        select * from room
+        select * from v_room
         where name=#{name} and password=#{password}
     </select>
     <select id="selectRoomById" resultType="online.morn.anightwerewolf.DO.RoomDO">
-        select * from room
+        select * from v_room
         where id=#{id}
     </select>
 </mapper>

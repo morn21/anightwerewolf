@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="online.morn.anightwerewolf.mapper.ActivityDetailMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.ActivityDetailDO">
-        insert into activity_detail
+        insert into v_activity_detail
         (id,createTime,updateTime,userId,activityId,seatNum,skillStatus,skillExtendInfo)
         values
         (#{activityDetailDO.id},now(),now(),#{activityDetailDO.userId},#{activityDetailDO.activityId},#{activityDetailDO.seatNum},#{activityDetailDO.skillStatus},#{activityDetailDO.skillExtendInfo})
     </insert>
     <update id="updateById" parameterType="online.morn.anightwerewolf.DO.ActivityDetailDO">
-        update activity_detail
+        update v_activity_detail
         set updateTime=now(),
         initialRoleCardId=#{activityDetailDO.initialRoleCardId},
         finalRoleCardId=#{activityDetailDO.finalRoleCardId},
@@ -19,12 +19,12 @@
         where id=#{activityDetailDO.id}
     </update>
     <select id="selectActivityDetailListByActivityId" resultType="online.morn.anightwerewolf.DO.ActivityDetailDO">
-        select * from activity_detail
+        select * from v_activity_detail
         where activityId=#{activityId}
         order by seatNum
     </select>
     <select id="selectActivityDetailByActivityIdAndSeatNum" resultType="online.morn.anightwerewolf.DO.ActivityDetailDO">
-        select * from activity_detail
+        select * from v_activity_detail
         where activityId=#{activityId} and seatNum=#{seatNum}
         order by seatNum
     </select>

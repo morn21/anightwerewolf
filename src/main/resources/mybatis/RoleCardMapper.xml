@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="online.morn.anightwerewolf.mapper.RoleCardMapper">
     <select id="selectRoleCardList" resultType="online.morn.anightwerewolf.DO.RoleCardDO" >
-        select * from role_card
+        select * from v_role_card
         order by orderNum
     </select>
     <select id="selectRoleCardListByIdList" resultType="online.morn.anightwerewolf.DO.RoleCardDO" >
-        select * from role_card
+        select * from v_role_card
         where id in
         <foreach collection="roleCardIdList" index="index" item="id" open="(" separator="," close=")">
             #{id}

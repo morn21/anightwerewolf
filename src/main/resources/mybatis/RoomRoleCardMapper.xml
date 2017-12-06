@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="online.morn.anightwerewolf.mapper.RoomRoleCardMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.RoomRoleCardDO">
-        insert into room_role_card
+        insert into v_room_role_card
         (id,roomId,roleCardId)
         values
         (#{roomRoleCardDO.id},#{roomRoleCardDO.roomId},#{roomRoleCardDO.roleCardId})
     </insert>
     <select id="selectRoomRoleCardListByRoomId" resultType="online.morn.anightwerewolf.DO.RoomRoleCardDO">
-        select * from room_role_card
+        select * from v_room_role_card
         where roomId=#{roomId}
     </select>
 </mapper>

@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="online.morn.anightwerewolf.mapper.ActivityMapper">
     <insert id="insert" parameterType="online.morn.anightwerewolf.DO.ActivityDO">
-        insert into activity
+        insert into v_activity
         (id,createTime,updateTime,roomId,speakNum,status)
         values
         (#{activityDO.id},now(),now(),#{activityDO.roomId},#{activityDO.speakNum},#{activityDO.status})
     </insert>
     <update id="updateById" parameterType="online.morn.anightwerewolf.DO.ActivityDO">
-        update activity
+        update v_activity
         set updateTime=now(),
         status=#{activityDO.status},
         skillRoleId=#{activityDO.skillRoleId},
@@ -16,12 +16,12 @@
         where id=#{activityDO.id}
     </update>
     <select id="selectUnfinishedActivityByRoomId" resultType="online.morn.anightwerewolf.DO.ActivityDO">
-        select * from activity
+        select * from v_activity
         where roomId=#{roomId} and status != 'END'
         order by createTime desc
     </select>
     <select id="selectActivityById" resultType="online.morn.anightwerewolf.DO.ActivityDO">
-        select * from activity
+        select * from v_activity
         where id=#{id}
     </select>
 </mapper>
