@@ -115,16 +115,14 @@ public class ActivityController {
                     }
                     dataMap.put("skillRoleCount",skillRoleCount);//已经执行完技能的角色数量
                     /**当前正在执行技能的角色是否存在于底牌当中*/
-                    boolean isNobody = false;
                     for(ActivityDetailDO detailDO : activityDetailDOList){
                         if(detailDO.getSeatNum() < 0){//底牌
                             RoleCardDO roleCardDO = roleCardDOMap.get(detailDO.getInitialRoleCardId());
                             if(roleCardDO.getRoleId().equals(currentRoleDO.getId())){
-                                isNobody = true;
+                                executeSkillByNobody(detailDO);//【私有方法】执行技能 -- 底牌标识为已执行技能
                             }
                         }
                     }
-                    dataMap.put("isNobody",isNobody);//当前正在执行技能的角色是否存在于底牌当中
                     /**当前用户是否需要执行技能*/
                     boolean isSkillByCurrent = false;
                     if(myActivityDetailDO.getSkillStatus() == 0 && currentRoleDO.getId().equals(myRoleDO.getId())){
@@ -178,65 +176,34 @@ public class ActivityController {
     }
 
     /**
-     * 执行技能 -- 底牌标识为已执行技能
-     * @auther Horner 2017/11/29 23:36
-     * @param modelMap
-     * @param request
-     * @param activityId
-     * @return
+     * 【私有方法】执行技能 -- 底牌标识为已执行技能
+     * @auther Horner 2017/12/9 1:22
+     * @param detailDO
+     * @throws MyException
      */
-    @RequestMapping(value = "/executeSkillByNobody.json", method = {RequestMethod.GET , RequestMethod.POST})
-    public String executeSkillByNobody(ModelMap modelMap, HttpServletRequest request, String activityId) {
-        try {
-            /**参数验证*/
-            if(StringUtils.isBlank(activityId)){
-                throw new MyException("场次ID不能为空");
-            }
-            /**Session取值*/
-            RoomDO roomDO = (RoomDO)request.getSession().getAttribute(SessionKey.ROOM);//获得房间实例
-            if(roomDO == null){
-                throw new MyException("房间未登录");
-            }
-            /**场次信息*/
-            ActivityDO activityDO = activityService.findActivityById(activityId);
-            if(!activityDO.getRoomId().equals(roomDO.getId())){
-                throw new MyException("您不在本场次的房间内");
-            }
-            if(ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
-                /**标识当前正在执行技能的底牌为已执行*/
-                boolean isChangeFlag = false;//对数据库做出修改的旗帜
-                ActivityDetailDO currentDetailDO = null;
-                List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
-                for(ActivityDetailDO detailDO : activityDetailDOList){
-                    if(detailDO.getSeatNum() < 0 && detailDO.getSkillStatus() == 0){//找出未执行技能的底牌
-                        RoleCardDO roleCardDO = roleCardService.findRoleCardById(detailDO.getInitialRoleCardId());
-                        if(roleCardDO.getRoleId().equals(activityDO.getSkillRoleId())){//底牌角色是否为当前执行技能的角色
-                            currentDetailDO = detailDO;
-                            isChangeFlag = true;
-                        }
-                    }
-                }
-                if(isChangeFlag){
-                    JSONObject skillExtendInfo = JSONObject.parseObject(currentDetailDO.getSkillExtendInfo());
-                    if(skillExtendInfo.getBoolean("isTread") == null){
-                        skillExtendInfo.put("isTread",true);
-                        currentDetailDO.setSkillExtendInfo(skillExtendInfo.toJSONString());
-                        activityDetailService.changeById(currentDetailDO);
+    private void executeSkillByNobody(final ActivityDetailDO detailDO) throws MyException {
+        JSONObject skillExtendInfo = JSONObject.parseObject(detailDO.getSkillExtendInfo());
+        if(skillExtendInfo.getBoolean("isTread") == null){
+            skillExtendInfo.put("isTread",true);
+            detailDO.setSkillExtendInfo(skillExtendInfo.toJSONString());
+            activityDetailService.changeById(detailDO);
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
                         Thread.sleep(10000);
-                        currentDetailDO.setSkillStatus(1);
-                        activityDetailService.changeById(currentDetailDO);
-                        activityService.changeActivityStatus(activityId);//更新场次状态 根据场次ID
+                        detailDO.setSkillStatus(1);
+                        activityDetailService.changeById(detailDO);
+                        activityService.changeActivityStatus(detailDO.getActivityId());//更新场次状态 根据场次ID
+                    } catch (MyException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
-            }
-            modelMap.put("success",true);
-        } catch (MyException e) {
-            modelMap.put("success",false);
-            modelMap.put("msg",e.getMessage());
-        } catch (Exception e){
-            e.printStackTrace();
+            });
+            thread.start();
         }
-        return JSONObject.toJSONString(modelMap);
     }
 
     /**

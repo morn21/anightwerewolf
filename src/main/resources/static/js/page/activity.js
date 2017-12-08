@@ -36,23 +36,6 @@ var showSetting = function(hiddenDomIds,showDomIds){
     }
 };
 
-//执行技能 -- 底牌标识为已执行技能
-var executeSkillByNobody = function () {
-    $.ajax({
-        type : "POST",  //提交方式
-        url : "/activity/executeSkillByNobody.json",//路径
-        data : {
-            activityId : $("#activityId").html()
-        },
-        dataType : "json",
-        success : function(result){
-            if(!result.success){
-                $("#errorMsgDiv").html(result.msg);
-            }
-        }
-    });
-};
-
 //技能设置
 var skillSetting = {
     nobodyCount : 3,//底牌数量
@@ -359,9 +342,6 @@ var processActivityStatusShowContent = function(data){
     } else if(data.status == "NOT_SKILL"){//未执行技能
         showSetting(["#notBigin","#notSkill","#notVote"],["#notSkill"]);//显示"未执行技能"模块
         showSetting([],["#mySkillMessage"]);//显示我的信息
-        if(data.isNobody){//当前正在执行技能的角色是否存在于底牌当中
-            setTimeout(executeSkillByNobody,1000);//执行技能 -- 底牌标识为已执行技能
-        }
         $("#mySeatNum").html(data.mySeatNum);//我的座号
         $("#myRoleCardName").html(data.myRoleCard.name);//我的角色牌名称
         $("#notSkill_currentRoleName").html(data.currentRole.name);//当前执行技能的角色名称
