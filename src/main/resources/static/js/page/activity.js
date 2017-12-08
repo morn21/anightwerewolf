@@ -139,7 +139,7 @@ var iniSkillButtonList = function(myRoleId,peopleCount,mySeatNum,mySkillStatus,m
     } else if(myRoleId == roleIdJson.WEREWOLF){//狼人
         if(mySkillExtendInfo.teammateSeatNumList == undefined){//不知道有几只狼的时候
             skillSetting.needSelectedCount = 0;
-            promptMsg = "点击【确认执行技能】查看队友";
+            promptMsg = "点击【确认执行技能】查看狼队友";
             skillSetting.hideNobody();//隐藏底牌
         } else if(mySkillExtendInfo.teammateSeatNumList.length == 0){//只有一只狼的时候
             if(mySkillExtendInfo.checkCardList == undefined){
@@ -166,8 +166,30 @@ var iniSkillButtonList = function(myRoleId,peopleCount,mySeatNum,mySkillStatus,m
         skillSetting.hideBody();//隐藏号码牌
     } else if(myRoleId == roleIdJson.MYSTIC_WOLF){//狼先知
     } else if(myRoleId == roleIdJson.MINION){//爪牙
+        skillSetting.needSelectedCount = 0;
+        var checkCardList = mySkillExtendInfo.checkCardList;
+        if(checkCardList == undefined){
+            promptMsg = "点击【确认执行技能】查看狼队友";
+        } else {
+            checkCardList.forEach(function (obj) {
+                resultMsg += "【" + obj.seatNum + "号】";
+            });
+            resultMsg += "是我的狼队友";
+        }
+        skillSetting.hideNobody();//隐藏底牌
+        skillSetting.hideBody();//隐藏号码牌
+
     } else if(myRoleId == roleIdJson.DREAM_WOLF){//贪睡狼
     } else if(myRoleId == roleIdJson.TANNER){//皮匠
+        skillSetting.needSelectedCount = 0;
+        var checkCard = mySkillExtendInfo.checkCard;
+        if(checkCard == undefined){
+            promptMsg = "点击【确认执行技能】自证，进入下一状态";
+        } else {
+            resultMsg = "昨晚我什么也没干";
+        }
+        skillSetting.hideNobody();//隐藏底牌
+        skillSetting.hideBody();//隐藏号码牌
     } else if(myRoleId == roleIdJson.SEER){//预言家
         skillSetting.isDisabledSeatNumList.push(mySeatNum);//禁用自己的座号
         if(mySkillExtendInfo.checkCardList == undefined){
@@ -233,14 +255,36 @@ var iniSkillButtonList = function(myRoleId,peopleCount,mySeatNum,mySkillStatus,m
         skillSetting.hideNobody();//隐藏底牌
         skillSetting.hideBody();//隐藏号码牌
     } else if(myRoleId == roleIdJson.HUNTER){//猎人
+        skillSetting.needSelectedCount = 0;
+        var checkCard = mySkillExtendInfo.checkCard;
+        if(checkCard == undefined){
+            promptMsg = "点击【确认执行技能】自证，进入下一状态";
+        } else {
+            resultMsg = "昨晚我什么也没干";
+        }
+        skillSetting.hideNobody();//隐藏底牌
+        skillSetting.hideBody();//隐藏号码牌
     } else if(myRoleId == roleIdJson.MASON){//守夜人
+        skillSetting.needSelectedCount = 0;
+        var checkCard = mySkillExtendInfo.checkCard;
+        if(checkCard == undefined){
+            promptMsg = "点击【确认执行技能】查看你的守夜人同伴";
+        } else {
+            if(checkCard.seatNum < 0){
+                resultMsg = "场上没有我的守夜人同伴";
+            } else {
+                resultMsg = "【" + checkCard.seatNum + "号】是我的守夜人同伴";
+            }
+        }
+        skillSetting.hideNobody();//隐藏底牌
+        skillSetting.hideBody();//隐藏号码牌
     } else if(myRoleId == roleIdJson.VILLAGER){//村民
         skillSetting.needSelectedCount = 0;
         var checkCard = mySkillExtendInfo.checkCard;
         if(checkCard == undefined){
-            promptMsg = "点击【确认执行技能】进入下一状态";
+            promptMsg = "点击【确认执行技能】自证，进入下一状态";
         } else {
-            resultMsg = "昨晚我什么都没干";
+            resultMsg = "昨晚我什么也没干";
         }
         skillSetting.hideNobody();//隐藏底牌
         skillSetting.hideBody();//隐藏号码牌

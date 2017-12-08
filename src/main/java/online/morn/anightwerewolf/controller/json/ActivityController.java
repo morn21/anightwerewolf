@@ -3,6 +3,7 @@ package online.morn.anightwerewolf.controller.json;
 import com.alibaba.fastjson.JSONObject;
 import online.morn.anightwerewolf.DO.*;
 import online.morn.anightwerewolf.service.*;
+import online.morn.anightwerewolf.util.MapMaker;
 import online.morn.anightwerewolf.util.MyException;
 import online.morn.anightwerewolf.util.enumeration.ActivityStatus;
 import online.morn.anightwerewolf.util.enumeration.RoleId;
@@ -40,7 +41,7 @@ public class ActivityController {
     @Autowired
     private RoleCardService roleCardService;
     @Autowired
-    private RoomService roomService;
+    private SkillService skillService;
 
     /**
      * 询问场次状态
@@ -93,8 +94,8 @@ public class ActivityController {
                     /**本房间下 角色以及角色牌*/
                     List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
                     List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
-                    Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
-                    Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+                    Map<String,RoleDO> roleDOMap = MapMaker.makeRoleMap(roleDOList);
+                    Map<String,RoleCardDO> roleCardDOMap = MapMaker.makeRoleCardMap(roleCardDOList);
                     dataMap.put("roleCount",roleDOList.size());//本房间的角色数量
                     dataMap.put("cardCount",roleCardDOList.size());//本房间的卡牌数量
                     /**我的初始 角色以及角色卡*/
@@ -139,8 +140,8 @@ public class ActivityController {
                     /**本房间下 角色以及角色牌*/
                     List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
                     List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
-                    Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
-                    Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+                    Map<String,RoleDO> roleDOMap = MapMaker.makeRoleMap(roleDOList);
+                    Map<String,RoleCardDO> roleCardDOMap = MapMaker.makeRoleCardMap(roleCardDOList);
                     /**我的初始 角色以及角色卡*/
                     RoleCardDO myRoleCardDO = roleCardDOMap.get(myActivityDetailDO.getInitialRoleCardId());
                     RoleDO myRoleDO = roleDOMap.get(myRoleCardDO.getRoleId());
@@ -231,160 +232,7 @@ public class ActivityController {
             if(roomDO == null){
                 throw new MyException("房间未登录");
             }
-            /**场次信息*/
-            ActivityDO activityDO = activityService.findActivityById(activityId);
-            if(!activityDO.getRoomId().equals(roomDO.getId())){
-                throw new MyException("您不在本场次的房间内");
-            }
-            if(!ActivityStatus.NOT_SKILL.equals(activityDO.getStatus())){
-                throw new MyException("场次状态错误");
-            }
-            /**场次明细信息*/
-            ActivityDetailDO myActivityDetailDO = null;
-            List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
-            for(ActivityDetailDO detailDO : activityDetailDOList){
-                if(userDO.getId().equals(detailDO.getUserId())){
-                    myActivityDetailDO = detailDO;
-                }
-            }
-            if(myActivityDetailDO == null){
-                throw new MyException("您不存在于本场次中");
-            }
-            /**本房间下 角色以及角色牌*/
-            List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
-            List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
-            Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
-            Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
-            /**枚举每一种角色*/
-            String mySkillExtendInfoJsonStr = myActivityDetailDO.getSkillExtendInfo();//我的技能扩展信息json字符串
-            if(RoleId.DOPPELGANGER.equals(activityDO.getSkillRoleId())){//化身幽灵
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.WEREWOLF.equals(activityDO.getSkillRoleId())){//狼人
-                WerewolfVO werewolfVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,WerewolfVO.class);
-                if(werewolfVO.getTeammateSeatNumList() == null){//不知道有几只狼的时候
-                    List<Integer> teammateSeatNumList = new ArrayList<>();
-                    for(ActivityDetailDO detailDO : activityDetailDOList){
-                        if(detailDO.getSeatNum() < 0 || detailDO.getId().equals(myActivityDetailDO.getId())){//不计算底牌 和 自己
-                            continue;
-                        }
-                        RoleCardDO roleCardDO = roleCardDOMap.get(detailDO.getInitialRoleCardId());
-                        String roleId = roleCardDO.getRoleId();
-                        if(roleId.equals(RoleId.WEREWOLF) || roleId.equals(RoleId.MYSTIC_WOLF) || roleId.equals(RoleId.DREAM_WOLF)){//狼人 狼先知 贪睡狼
-                            teammateSeatNumList.add(detailDO.getSeatNum());
-                        }
-                        ///////////////////这里还没处理化身幽灵 化身狼的情况
-                    }
-                    if(teammateSeatNumList.size() > 0){//存在狼队友的时候
-                        myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                    }
-                    werewolfVO.setTeammateSeatNumList(teammateSeatNumList);//设置狼队友座号列表
-                    mySkillExtendInfoJsonStr = JSONObject.toJSONString(werewolfVO);//我的技能扩展信息json字符串
-                } else if(werewolfVO.getTeammateSeatNumList().size() == 0){//不存在狼队友的时候
-                    List<CheckCardVO> checkCardList = werewolfVO.getCheckCardList();//查牌列表
-                    if(checkCardList == null){
-                        checkCardList = new ArrayList<>();
-                    }
-                    CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(0));//执行查牌
-                    checkCardList.add(checkCard);
-                    String roleId = checkCard.getRoleId();
-                    if((!roleId.equals(RoleId.WEREWOLF) && !roleId.equals(RoleId.MYSTIC_WOLF) && !roleId.equals(RoleId.DREAM_WOLF)) || checkCardList.size() == 2){//查到的不是【狼人、狼先知、贪睡狼】 或 查了两张牌了
-                        myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                    }
-                    werewolfVO.setCheckCardList(checkCardList);
-                    mySkillExtendInfoJsonStr = JSONObject.toJSONString(werewolfVO);//我的技能扩展信息json字符串
-                }
-            } else if(RoleId.MYSTIC_WOLF.equals(activityDO.getSkillRoleId())){//狼先知
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.MINION.equals(activityDO.getSkillRoleId())){//爪牙
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.DREAM_WOLF.equals(activityDO.getSkillRoleId())){//贪睡狼
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.TANNER.equals(activityDO.getSkillRoleId())){//皮匠
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.SEER.equals(activityDO.getSkillRoleId())){//预言家
-                SeerVO seerVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,SeerVO.class);
-                List<CheckCardVO> checkCardList = seerVO.getCheckCardList();//查牌列表
-                if(checkCardList == null){
-                    checkCardList = new ArrayList<>();
-                }
-                CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(0));//执行查牌
-                checkCardList.add(checkCard);
-                if(checkCard.getSeatNum() > 0 || checkCardList.size() == 2){
-                    myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                }
-                seerVO.setCheckCardList(checkCardList);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(seerVO);//我的技能扩展信息json字符串
-            } else if(RoleId.APPRENTICE_SEER.equals(activityDO.getSkillRoleId())){//见习预言家
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.ROBBER.equals(activityDO.getSkillRoleId())){//强盗
-                RobberVO robberVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,RobberVO.class);
-                CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(0));//执行查牌
-                for(ActivityDetailDO detailDO : activityDetailDOList){
-                    if(detailDO.getSeatNum() == checkCard.getSeatNum()){//找到对应的牌 将自己的牌与对方交换
-                        this.executeSwapCard(myActivityDetailDO,detailDO);//执行换牌
-                        break;
-                    }
-                }
-                myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                robberVO.setCheckCard(checkCard);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(robberVO);//我的技能扩展信息json字符串
-            } else if(RoleId.WITCH.equals(activityDO.getSkillRoleId())){//女巫
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.TROUBLEMAKER.equals(activityDO.getSkillRoleId())){//捣蛋鬼
-                TroubleMakerVO troubleMakerVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,TroubleMakerVO.class);
-                List<CheckCardVO> checkCardList = new ArrayList<>();//查牌列表
-                CheckCardVO checkCard1 =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(0));//执行查牌
-                CheckCardVO checkCard2 =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(1));//执行查牌
-                checkCardList.add(checkCard1);
-                checkCardList.add(checkCard2);
-                /**执行交换*/
-                ActivityDetailDO detailDO1 = null;
-                ActivityDetailDO detailDO2 = null;
-                for(ActivityDetailDO detailDO : activityDetailDOList){
-                    if(detailDO.getSeatNum() == checkCard1.getSeatNum()){
-                        detailDO1 = detailDO;
-                    } else if(detailDO.getSeatNum() == checkCard2.getSeatNum()){
-                        detailDO2 = detailDO;
-                    }
-                }
-                this.executeSwapCard(detailDO1,detailDO2);//执行换牌
-                myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                troubleMakerVO.setCheckCardList(checkCardList);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(troubleMakerVO);//我的技能扩展信息json字符串
-            } else if(RoleId.DRUNK.equals(activityDO.getSkillRoleId())){//酒鬼
-                DrunkVO drunkVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,DrunkVO.class);
-                CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,isSelectedSeatNumList.get(0));//执行查牌
-                for(ActivityDetailDO detailDO : activityDetailDOList){
-                    if(detailDO.getSeatNum() == checkCard.getSeatNum()){//找到对应的牌 将自己的牌与对方交换
-                        this.executeSwapCard(myActivityDetailDO,detailDO);//执行换牌
-                        break;
-                    }
-                }
-                myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                drunkVO.setCheckCard(checkCard);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(drunkVO);//我的技能扩展信息json字符串
-            } else if(RoleId.INSOMNIAC.equals(activityDO.getSkillRoleId())){//失眠者
-                InsomniacVO insomniacVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,InsomniacVO.class);
-                CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,myActivityDetailDO.getSeatNum());//执行查牌
-                myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                insomniacVO.setCheckCard(checkCard);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(insomniacVO);//我的技能扩展信息json字符串
-            } else if(RoleId.HUNTER.equals(activityDO.getSkillRoleId())){//猎人
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.MASON.equals(activityDO.getSkillRoleId())){//守夜人
-                ////////////////////////////////////////////////////////////////////////////
-            } else if(RoleId.VILLAGER.equals(activityDO.getSkillRoleId())){//村民
-                VillagerVO villagerVO = jsonStrToJavaObject(mySkillExtendInfoJsonStr,VillagerVO.class);
-                CheckCardVO checkCard =  this.executeCheckCard(activityDetailDOList,roleDOMap,roleCardDOMap,myActivityDetailDO.getSeatNum());//执行查牌
-                myActivityDetailDO.setSkillStatus(1);//标记技能已执行
-                villagerVO.setCheckCard(checkCard);
-                mySkillExtendInfoJsonStr = JSONObject.toJSONString(villagerVO);//我的技能扩展信息json字符串
-            }
-            if(!mySkillExtendInfoJsonStr.equals(new JSONObject().toJSONString())){
-                myActivityDetailDO.setSkillExtendInfo(mySkillExtendInfoJsonStr);//设置技能扩展信息
-                activityDetailService.changeById(myActivityDetailDO);
-            }
-            activityService.changeActivityStatus(activityId);//更新场次状态 根据场次ID
+            skillService.executeMySkill(userDO.getId(),activityId,isSelectedSeatNumList);//执行我的技能
             modelMap.put("success",true);
         } catch (MyException e) {
             modelMap.put("success",false);
@@ -484,7 +332,7 @@ public class ActivityController {
             //List<RoleDO> roleDOList = roleService.findRoleByRoomId(roomDO.getId());//获本房间全部角色
             List<RoleCardDO> roleCardDOList = roleCardService.findRoleCardByRoomId(roomDO.getId());//获本房间全部角色牌
             //Map<String,RoleDO> roleDOMap = this.makeRoleMap(roleDOList);
-            Map<String,RoleCardDO> roleCardDOMap = this.makeRoleCardMap(roleCardDOList);
+            Map<String,RoleCardDO> roleCardDOMap = MapMaker.makeRoleCardMap(roleCardDOList);
             List<ActivityDetailDO> activityDetailDOList = activityDetailService.findActivityDetailListByActivityId(activityId);
             activityDetailDOList = this.sortingDetail(activityDetailDOList);//【私有方法】场次明细排序
             List<Map<String,Object>> resultList = new ArrayList<>();//结果列表
@@ -527,91 +375,4 @@ public class ActivityController {
         }
         return newDetailList;
     }
-
-    /**
-     * 【私有方法】执行换牌
-     * @auther Horner 2017/12/3 17:37
-     * @param detailDO1
-     * @param detailDO2
-     */
-    private void executeSwapCard(ActivityDetailDO detailDO1, ActivityDetailDO detailDO2) throws MyException {
-        String roleCardId = detailDO1.getFinalRoleCardId();
-        detailDO1.setFinalRoleCardId(detailDO2.getFinalRoleCardId());
-        detailDO2.setFinalRoleCardId(roleCardId);
-        activityDetailService.changeById(detailDO1);
-        activityDetailService.changeById(detailDO2);
-    }
-
-    /**
-     * 【私有方法】执行查牌
-     * @auther Horner 2017/12/3 17:27
-     * @param activityDetailDOList
-     * @param roleDOMap
-     * @param roleCardDOMap
-     * @param isSelectedSeatNum 选中要查的座号
-     * @return
-     */
-    private CheckCardVO executeCheckCard(List<ActivityDetailDO> activityDetailDOList, Map<String,RoleDO> roleDOMap, Map<String,RoleCardDO> roleCardDOMap, Integer isSelectedSeatNum){
-        CheckCardVO checkCard = new CheckCardVO();
-        for(ActivityDetailDO detailDO : activityDetailDOList){
-            if(detailDO.getSeatNum() == isSelectedSeatNum){
-                RoleCardDO roleCardDO = roleCardDOMap.get(detailDO.getFinalRoleCardId());//查当下角色牌
-                RoleDO roleDO = roleDOMap.get(roleCardDO.getRoleId());
-                checkCard.setSeatNum(detailDO.getSeatNum());//座牌号
-                checkCard.setRoleId(roleDO.getId());//角色ID
-                checkCard.setRoleNmae(roleDO.getName());//角色名称
-                checkCard.setRoleCardId(roleCardDO.getId());//角色牌ID
-                checkCard.setRoleCardName(roleCardDO.getName());//角色牌名称
-                break;
-            }
-        }
-        return checkCard;
-    }
-
-    /**
-     * 【私有方法】json字符串转Java对象
-     * @auther Horner 2017/12/3 13:19
-     * @param jsonStr
-     * @param tClass
-     * @param <T>
-     * @return
-     */
-    private <T> T jsonStrToJavaObject(String jsonStr, Class<T> tClass){
-        return (T) JSONObject.toJavaObject(JSONObject.parseObject(jsonStr),tClass);
-    }
-
-    /*public static void main(String[] args){
-        ActivityController a = new ActivityController();
-        WerewolfVO werewolfVO = a.jsonStrToJavaObject("{}",WerewolfVO.class);
-        String aa = "1111";
-    }*/
-
-    /**
-     * 【私有方法】制作角色Map --- key为角色ID
-     * @auther Horner 2017/11/29 19:58
-     * @param roleDOList
-     * @return
-     */
-    private Map<String,RoleDO> makeRoleMap(List<RoleDO> roleDOList){
-        Map<String,RoleDO> roleMap = new HashMap<>();
-        for(RoleDO roleDO : roleDOList){
-            roleMap.put(roleDO.getId(),roleDO);
-        }
-        return roleMap;
-    }
-
-    /**
-     * 【私有方法】制作角色牌Map --- key为角色牌ID
-     * @auther Horner 2017/11/29 19:58
-     * @param roleCardDOList
-     * @return
-     */
-    private Map<String,RoleCardDO> makeRoleCardMap(List<RoleCardDO> roleCardDOList){
-        Map<String,RoleCardDO> roleCardMap = new HashMap<>();
-        for(RoleCardDO roleCardDO : roleCardDOList){
-            roleCardMap.put(roleCardDO.getId(),roleCardDO);
-        }
-        return roleCardMap;
-    }
-
 }
