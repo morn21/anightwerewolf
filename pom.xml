@@ -113,9 +113,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
+
+        <!-- C3P0数据库连接池 -->
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.1.2</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <finalName>anight</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
